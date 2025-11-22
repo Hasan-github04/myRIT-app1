@@ -1,0 +1,28 @@
+
+> my-app@0.0.0 build
+> vite build
+
+[36mvite v7.2.4 [32mbuilding client environment for production...[36m[39m
+transforming...
+[32mÔ£ô[39m 29 modules transformed.
+Ô£ù Build failed in 527ms
+error during build:
+src/main.jsx (3:7): "default" is not exported by "src/App.jsx", imported by "src/main.jsx".
+file: C:/Users/aliwa/OneDrive/Desktop/UniversityWork/ISTE-260/myRIT-app1/src/main.jsx:3:7
+
+1: import React from 'react';
+2: import { createRoot } from 'react-dom/client';
+3: import App from './App';
+          ^
+4: import './index.css'; // Optional: if you have global styles
+
+    at getRollupError (file:///C:/Users/aliwa/OneDrive/Desktop/UniversityWork/ISTE-260/myRIT-app1/node_modules/rollup/dist/es/shared/parseAst.js:401:41)
+    at error (file:///C:/Users/aliwa/OneDrive/Desktop/UniversityWork/ISTE-260/myRIT-app1/node_modules/rollup/dist/es/shared/parseAst.js:397:42)
+    at Module.error (file:///C:/Users/aliwa/OneDrive/Desktop/UniversityWork/ISTE-260/myRIT-app1/node_modules/rollup/dist/es/shared/node-entry.js:16956:16)
+    at Module.traceVariable (file:///C:/Users/aliwa/OneDrive/Desktop/UniversityWork/ISTE-260/myRIT-app1/node_modules/rollup/dist/es/shared/node-entry.js:17412:29)
+    at ModuleScope.findVariable (file:///C:/Users/aliwa/OneDrive/Desktop/UniversityWork/ISTE-260/myRIT-app1/node_modules/rollup/dist/es/shared/node-entry.js:15076:39)
+    at Identifier.bind (file:///C:/Users/aliwa/OneDrive/Desktop/UniversityWork/ISTE-260/myRIT-app1/node_modules/rollup/dist/es/shared/node-entry.js:5423:40)
+    at CallExpression.bind (file:///C:/Users/aliwa/OneDrive/Desktop/UniversityWork/ISTE-260/myRIT-app1/node_modules/rollup/dist/es/shared/node-entry.js:2809:28)
+    at CallExpression.bind (file:///C:/Users/aliwa/OneDrive/Desktop/UniversityWork/ISTE-260/myRIT-app1/node_modules/rollup/dist/es/shared/node-entry.js:12123:15)
+    at Property.bind (file:///C:/Users/aliwa/OneDrive/Desktop/UniversityWork/ISTE-260/myRIT-app1/node_modules/rollup/dist/es/shared/node-entry.js:2813:23)
+    at ObjectExpression.bind (file:///C:/Users/aliwa/OneDrive/Desktop/UniversityWork/ISTE-260/myRIT-app1/node_modules/rollup/dist/es/shared/node-entry.js:2809:28)

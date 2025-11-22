@@ -37,8 +37,21 @@ export default function SISScreen() {
   const unreadHolds = studentHolds.filter((h) => !h.resolved).length;
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.backgroundSecondary }]}>
-      <View style={[styles.tabContainer, { backgroundColor: colors.background, borderBottomColor: colors.border }]}>
+    <View
+      style={[
+        styles.container,
+        { backgroundColor: colors.backgroundSecondary },
+      ]}
+    >
+      <View
+        style={[
+          styles.tabContainer,
+          {
+            backgroundColor: colors.background,
+            borderBottomColor: colors.border,
+          },
+        ]}
+      >
         <TabButton
           icon={BookOpen}
           label="Academic Records"
@@ -93,6 +106,7 @@ function TabButton({
   onPress,
   colors,
   badgeColor,
+  icon: Icon,
 }) {
   return (
     <TouchableOpacity
@@ -104,7 +118,10 @@ function TabButton({
       activeOpacity={0.7}
     >
       <View style={styles.tabButtonContent}>
-        <Icon size={20} color={active ? colors.primary : colors.textSecondary} />
+        <Icon
+          size={20}
+          color={active ? colors.primary : colors.textSecondary}
+        />
         <Text
           style={[
             styles.tabLabel,
@@ -146,7 +163,12 @@ function AcademicRecords({ colors }) {
         <Text style={[styles.sectionTitle, { color: colors.text }]}>
           In Progress
         </Text>
-        <View style={[styles.countBadge, { backgroundColor: colors.backgroundSecondary }]}>
+        <View
+          style={[
+            styles.countBadge,
+            { backgroundColor: colors.backgroundSecondary },
+          ]}
+        >
           <Text style={[styles.countText, { color: colors.textSecondary }]}>
             {inProgress.length}
           </Text>
@@ -156,11 +178,16 @@ function AcademicRecords({ colors }) {
       {inProgress.map((grade) => (
         <View
           key={grade.courseId}
-          style={[styles.gradeCard, { backgroundColor: colors.card, borderColor: colors.border }]}
+          style={[
+            styles.gradeCard,
+            { backgroundColor: colors.card, borderColor: colors.border },
+          ]}
         >
           <View style={styles.gradeHeader}>
             <View>
-              <Text style={[styles.courseCode, { color: colors.textSecondary }]}>
+              <Text
+                style={[styles.courseCode, { color: colors.textSecondary }]}
+              >
                 {grade.courseCode}
               </Text>
               <Text style={[styles.courseName, { color: colors.text }]}>
@@ -173,7 +200,12 @@ function AcademicRecords({ colors }) {
                 { backgroundColor: getGradeColor(grade.grade) + "20" },
               ]}
             >
-              <Text style={[styles.gradeText, { color: getGradeColor(grade.grade) }]}>
+              <Text
+                style={[
+                  styles.gradeText,
+                  { color: getGradeColor(grade.grade) },
+                ]}
+              >
                 {grade.grade}
               </Text>
             </View>
@@ -189,7 +221,12 @@ function AcademicRecords({ colors }) {
         <Text style={[styles.sectionTitle, { color: colors.text }]}>
           Completed Courses
         </Text>
-        <View style={[styles.countBadge, { backgroundColor: colors.backgroundSecondary }]}>
+        <View
+          style={[
+            styles.countBadge,
+            { backgroundColor: colors.backgroundSecondary },
+          ]}
+        >
           <Text style={[styles.countText, { color: colors.textSecondary }]}>
             {completed.length}
           </Text>
@@ -199,11 +236,16 @@ function AcademicRecords({ colors }) {
       {completed.map((grade) => (
         <View
           key={grade.courseId}
-          style={[styles.gradeCard, { backgroundColor: colors.card, borderColor: colors.border }]}
+          style={[
+            styles.gradeCard,
+            { backgroundColor: colors.card, borderColor: colors.border },
+          ]}
         >
           <View style={styles.gradeHeader}>
             <View>
-              <Text style={[styles.courseCode, { color: colors.textSecondary }]}>
+              <Text
+                style={[styles.courseCode, { color: colors.textSecondary }]}
+              >
                 {grade.courseCode}
               </Text>
               <Text style={[styles.courseName, { color: colors.text }]}>
@@ -216,7 +258,12 @@ function AcademicRecords({ colors }) {
                 { backgroundColor: getGradeColor(grade.grade) + "20" },
               ]}
             >
-              <Text style={[styles.gradeText, { color: getGradeColor(grade.grade) }]}>
+              <Text
+                style={[
+                  styles.gradeText,
+                  { color: getGradeColor(grade.grade) },
+                ]}
+              >
                 {grade.grade}
               </Text>
             </View>
@@ -234,25 +281,28 @@ function ShoppingCartSection({ colors }) {
   const totalCredits = cartCourses.reduce((sum, c) => sum + c.credits, 0);
 
   const handleRemove = (course) => {
-    Alert.alert(
-      "Remove Course",
-      `Remove ${course.courseCode} from cart?`,
-      [
-        { text: "Cancel", style: "cancel" },
-        { text: "Remove", style: "destructive" },
-      ]
-    );
+    Alert.alert("Remove Course", `Remove ${course.courseCode} from cart?`, [
+      { text: "Cancel", style: "cancel" },
+      { text: "Remove", style: "destructive" },
+    ]);
   };
 
   return (
     <View>
-      <View style={[styles.cartHeader, { backgroundColor: colors.card, borderColor: colors.border }]}>
+      <View
+        style={[
+          styles.cartHeader,
+          { backgroundColor: colors.card, borderColor: colors.border },
+        ]}
+      >
         <View style={styles.cartHeaderContent}>
           <View>
             <Text style={[styles.cartSemester, { color: colors.text }]}>
               Fall 2025
             </Text>
-            <Text style={[styles.cartSubtitle, { color: colors.textSecondary }]}>
+            <Text
+              style={[styles.cartSubtitle, { color: colors.textSecondary }]}
+            >
               {cartCourses.length} courses • {totalCredits} credits
             </Text>
           </View>
@@ -266,7 +316,12 @@ function ShoppingCartSection({ colors }) {
       </View>
 
       {cartCourses.length === 0 ? (
-        <View style={[styles.emptyCart, { backgroundColor: colors.card, borderColor: colors.border }]}>
+        <View
+          style={[
+            styles.emptyCart,
+            { backgroundColor: colors.card, borderColor: colors.border },
+          ]}
+        >
           <ShoppingCart size={48} color={colors.textSecondary} />
           <Text style={[styles.emptyText, { color: colors.textSecondary }]}>
             Your cart is empty
@@ -279,15 +334,25 @@ function ShoppingCartSection({ colors }) {
         cartCourses.map((course) => (
           <View
             key={course.courseId}
-            style={[styles.cartCard, { backgroundColor: colors.card, borderColor: colors.border }]}
+            style={[
+              styles.cartCard,
+              { backgroundColor: colors.card, borderColor: colors.border },
+            ]}
           >
             <View style={styles.cartCardContent}>
               <View style={styles.cartCourseInfo}>
                 <View style={styles.cartCourseHeader}>
-                  <Text style={[styles.courseCode, { color: colors.textSecondary }]}>
+                  <Text
+                    style={[styles.courseCode, { color: colors.textSecondary }]}
+                  >
                     {course.courseCode}
                   </Text>
-                  <View style={[styles.creditsBadge, { backgroundColor: colors.backgroundSecondary }]}>
+                  <View
+                    style={[
+                      styles.creditsBadge,
+                      { backgroundColor: colors.backgroundSecondary },
+                    ]}
+                  >
                     <Text style={[styles.creditsText, { color: colors.text }]}>
                       {course.credits} cr
                     </Text>
@@ -299,13 +364,24 @@ function ShoppingCartSection({ colors }) {
                 <View style={styles.cartDetails}>
                   <View style={styles.cartDetailRow}>
                     <Clock size={14} color={colors.textSecondary} />
-                    <Text style={[styles.cartDetailText, { color: colors.textSecondary }]}>
-                      {course.days.join(", ")} • {course.startTime}-{course.endTime}
+                    <Text
+                      style={[
+                        styles.cartDetailText,
+                        { color: colors.textSecondary },
+                      ]}
+                    >
+                      {course.days.join(", ")} • {course.startTime}-
+                      {course.endTime}
                     </Text>
                   </View>
                   <View style={styles.cartDetailRow}>
                     <Users size={14} color={colors.textSecondary} />
-                    <Text style={[styles.cartDetailText, { color: colors.textSecondary }]}>
+                    <Text
+                      style={[
+                        styles.cartDetailText,
+                        { color: colors.textSecondary },
+                      ]}
+                    >
                       {course.instructor}
                     </Text>
                   </View>
@@ -331,7 +407,10 @@ function ShoppingCartSection({ colors }) {
               </View>
               <TouchableOpacity
                 onPress={() => handleRemove(course)}
-                style={[styles.removeButton, { backgroundColor: colors.error + "15" }]}
+                style={[
+                  styles.removeButton,
+                  { backgroundColor: colors.error + "15" },
+                ]}
                 activeOpacity={0.7}
               >
                 <Trash2 size={18} color={colors.error} />
@@ -346,14 +425,10 @@ function ShoppingCartSection({ colors }) {
 
 function StarfishSection({ colors }) {
   const handleBookAppointment = (advisor, slot) => {
-    Alert.alert(
-      "Book Appointment",
-      `Book with ${advisor.name} on ${slot}?`,
-      [
-        { text: "Cancel", style: "cancel" },
-        { text: "Confirm", onPress: () => console.log("Appointment booked") },
-      ]
-    );
+    Alert.alert("Book Appointment", `Book with ${advisor.name} on ${slot}?`, [
+      { text: "Cancel", style: "cancel" },
+      { text: "Confirm", onPress: () => console.log("Appointment booked") },
+    ]);
   };
 
   const getRoleIcon = (role) => {
@@ -451,17 +526,16 @@ function StarfishSection({ colors }) {
   );
 }
 
-function AdvisorCard({
-  advisor,
-  colors,
-  onBook,
-  roleIcon,
-  roleLabel,
-}) {
+function AdvisorCard({ advisor, colors, onBook, roleIcon, roleLabel }) {
   const [expanded, setExpanded] = useState(false);
 
   return (
-    <View style={[styles.advisorCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
+    <View
+      style={[
+        styles.advisorCard,
+        { backgroundColor: colors.card, borderColor: colors.border },
+      ]}
+    >
       <TouchableOpacity
         onPress={() => setExpanded(!expanded)}
         style={styles.advisorHeader}
@@ -474,7 +548,9 @@ function AdvisorCard({
               <Text style={[styles.advisorName, { color: colors.text }]}>
                 {advisor.name}
               </Text>
-              <Text style={[styles.advisorRole, { color: colors.textSecondary }]}>
+              <Text
+                style={[styles.advisorRole, { color: colors.textSecondary }]}
+              >
                 {roleLabel} • {advisor.department}
               </Text>
             </View>
@@ -498,7 +574,10 @@ function AdvisorCard({
             <TouchableOpacity
               key={index}
               onPress={() => onBook(advisor, slot)}
-              style={[styles.slotButton, { backgroundColor: colors.backgroundSecondary }]}
+              style={[
+                styles.slotButton,
+                { backgroundColor: colors.backgroundSecondary },
+              ]}
               activeOpacity={0.7}
             >
               <Calendar size={16} color={colors.primary} />
@@ -541,8 +620,18 @@ function TasksSection({ colors }) {
   return (
     <View>
       {activeHolds.length === 0 ? (
-        <View style={[styles.noHolds, { backgroundColor: colors.card, borderColor: colors.border }]}>
-          <View style={[styles.noHoldsIcon, { backgroundColor: colors.success + "20" }]}>
+        <View
+          style={[
+            styles.noHolds,
+            { backgroundColor: colors.card, borderColor: colors.border },
+          ]}
+        >
+          <View
+            style={[
+              styles.noHoldsIcon,
+              { backgroundColor: colors.success + "20" },
+            ]}
+          >
             <Text style={styles.noHoldsEmoji}>✓</Text>
           </View>
           <Text style={[styles.noHoldsTitle, { color: colors.text }]}>
@@ -554,14 +643,23 @@ function TasksSection({ colors }) {
         </View>
       ) : (
         <>
-          <View style={[styles.holdsWarning, { backgroundColor: colors.error + "15", borderColor: colors.error + "30" }]}>
+          <View
+            style={[
+              styles.holdsWarning,
+              {
+                backgroundColor: colors.error + "15",
+                borderColor: colors.error + "30",
+              },
+            ]}
+          >
             <XCircle size={20} color={colors.error} />
             <View style={styles.holdsWarningContent}>
               <Text style={[styles.holdsWarningTitle, { color: colors.error }]}>
                 Action Required
               </Text>
               <Text style={[styles.holdsWarningText, { color: colors.error }]}>
-                You have {activeHolds.length} hold{activeHolds.length > 1 ? "s" : ""} that need attention
+                You have {activeHolds.length} hold
+                {activeHolds.length > 1 ? "s" : ""} that need attention
               </Text>
             </View>
           </View>
@@ -569,7 +667,10 @@ function TasksSection({ colors }) {
           {activeHolds.map((hold) => (
             <View
               key={hold.id}
-              style={[styles.holdCard, { backgroundColor: colors.card, borderColor: colors.border }]}
+              style={[
+                styles.holdCard,
+                { backgroundColor: colors.card, borderColor: colors.border },
+              ]}
             >
               <View style={styles.holdHeader}>
                 <View style={styles.holdTitleRow}>
@@ -578,7 +679,12 @@ function TasksSection({ colors }) {
                     <Text style={[styles.holdTitle, { color: colors.text }]}>
                       {hold.title}
                     </Text>
-                    <View style={[styles.holdTypeBadge, { backgroundColor: getHoldColor(hold.type) + "20" }]}>
+                    <View
+                      style={[
+                        styles.holdTypeBadge,
+                        { backgroundColor: getHoldColor(hold.type) + "20" },
+                      ]}
+                    >
                       <Text
                         style={[
                           styles.holdTypeText,
@@ -591,18 +697,27 @@ function TasksSection({ colors }) {
                   </View>
                 </View>
               </View>
-              <Text style={[styles.holdDescription, { color: colors.textSecondary }]}>
+              <Text
+                style={[
+                  styles.holdDescription,
+                  { color: colors.textSecondary },
+                ]}
+              >
                 {hold.description}
               </Text>
               <Text style={[styles.holdDate, { color: colors.textSecondary }]}>
-                Posted: {new Date(hold.date).toLocaleDateString("en-US", {
+                Posted:{" "}
+                {new Date(hold.date).toLocaleDateString("en-US", {
                   month: "short",
                   day: "numeric",
                   year: "numeric",
                 })}
               </Text>
               <TouchableOpacity
-                style={[styles.resolveButton, { backgroundColor: colors.primary }]}
+                style={[
+                  styles.resolveButton,
+                  { backgroundColor: colors.primary },
+                ]}
                 activeOpacity={0.8}
               >
                 <Text style={styles.resolveButtonText}>Resolve Hold</Text>
@@ -798,114 +913,110 @@ const styles = StyleSheet.create({
   removeButton: {
     width: 40,
     height: 40,
-    borderRadius: 10,
+    borderRadius: 20,
     alignItems: "center",
     justifyContent: "center",
   },
   starfishIntro: {
     fontSize: 14,
-    marginBottom: 20,
-    lineHeight: 20,
+    marginBottom: 24,
   },
   advisorCard: {
     borderRadius: 12,
-    overflow: "hidden",
     marginBottom: 12,
     borderWidth: 1,
+    overflow: "hidden",
   },
   advisorHeader: {
+    padding: 16,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    padding: 16,
   },
   advisorInfo: {
     flex: 1,
   },
   advisorTitleRow: {
     flexDirection: "row",
-    alignItems: "center",
     gap: 12,
+    alignItems: "center",
   },
   advisorIcon: {
-    fontSize: 32,
+    fontSize: 24,
   },
   advisorName: {
     fontSize: 16,
-    fontWeight: "700",
+    fontWeight: "600",
   },
   advisorRole: {
     fontSize: 13,
     marginTop: 2,
   },
   advisorSlots: {
-    paddingHorizontal: 16,
-    paddingBottom: 16,
     borderTopWidth: 1,
-    paddingTop: 16,
+    padding: 16,
   },
   slotsTitle: {
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: "600",
-    textTransform: "uppercase",
-    marginBottom: 10,
+    marginBottom: 12,
   },
   slotButton: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 10,
+    gap: 8,
     padding: 12,
-    borderRadius: 10,
+    borderRadius: 8,
     marginBottom: 8,
   },
   slotText: {
     fontSize: 14,
-    fontWeight: "600",
+    fontWeight: "500",
   },
   noHolds: {
-    borderRadius: 12,
-    padding: 40,
+    padding: 32,
     alignItems: "center",
+    borderRadius: 12,
     borderWidth: 1,
   },
   noHoldsIcon: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     alignItems: "center",
     justifyContent: "center",
     marginBottom: 16,
   },
   noHoldsEmoji: {
-    fontSize: 40,
+    fontSize: 24,
   },
   noHoldsTitle: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: "700",
-    marginBottom: 4,
+    marginBottom: 8,
   },
   noHoldsText: {
     fontSize: 14,
+    textAlign: "center",
   },
   holdsWarning: {
     flexDirection: "row",
-    alignItems: "center",
     gap: 12,
     padding: 16,
     borderRadius: 12,
-    marginBottom: 16,
     borderWidth: 1,
+    marginBottom: 24,
   },
   holdsWarningContent: {
     flex: 1,
   },
   holdsWarningTitle: {
-    fontSize: 15,
+    fontSize: 16,
     fontWeight: "700",
+    marginBottom: 4,
   },
   holdsWarningText: {
-    fontSize: 13,
-    marginTop: 2,
+    fontSize: 14,
   },
   holdCard: {
     borderRadius: 12,
@@ -914,48 +1025,47 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   holdHeader: {
-    marginBottom: 10,
+    marginBottom: 12,
   },
   holdTitleRow: {
     flexDirection: "row",
-    alignItems: "center",
     gap: 12,
   },
   holdIcon: {
-    fontSize: 32,
+    fontSize: 24,
   },
   holdTitle: {
     fontSize: 16,
-    fontWeight: "700",
+    fontWeight: "600",
     marginBottom: 6,
   },
   holdTypeBadge: {
+    alignSelf: "flex-start",
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: 6,
-    alignSelf: "flex-start",
   },
   holdTypeText: {
-    fontSize: 10,
+    fontSize: 11,
     fontWeight: "700",
   },
   holdDescription: {
     fontSize: 14,
+    marginBottom: 12,
     lineHeight: 20,
-    marginBottom: 10,
   },
   holdDate: {
     fontSize: 12,
-    marginBottom: 12,
+    marginBottom: 16,
   },
   resolveButton: {
-    paddingVertical: 12,
-    borderRadius: 10,
+    paddingVertical: 10,
+    borderRadius: 8,
     alignItems: "center",
   },
   resolveButtonText: {
     color: "#FFFFFF",
     fontSize: 14,
-    fontWeight: "700",
+    fontWeight: "600",
   },
 });

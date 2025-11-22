@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { Stack, useLocalSearchParams } from "expo-router";
+import { useParams, useNavigate } from "react-router-dom";
 import {
   BookOpen,
   Calendar,
@@ -19,6 +19,7 @@ import {
   UserCheck,
   Video,
   ChevronRight,
+  ArrowLeft,
 } from "lucide-react-native";
 
 import { useTheme } from "@/constants/ThemeContext";
@@ -39,7 +40,8 @@ const menuItems = [
 
 export default function CourseDetailScreen() {
   const { colors } = useTheme();
-  const { id } = useLocalSearchParams();
+  const { id } = useParams();
+  const navigate = useNavigate();
   const course = courses.find((c) => c.id === id);
   const courseAssignments = assignments.filter((a) => a.courseId === id);
 
@@ -55,30 +57,32 @@ export default function CourseDetailScreen() {
 
   return (
     <>
-      <Stack.Screen
-        options={{
-          title: course.code,
-          headerStyle: {
+      <View
+        style={[
+          styles.headerBar,
+          {
             backgroundColor: colors.background,
+            borderBottomColor: colors.border,
           },
-          headerTitleStyle: {
-            color: colors.text,
-            fontWeight: "700",
-          },
-          headerTintColor: colors.primary,
-        }}
-      />
+        ]}
+      >
+        <TouchableOpacity
+          onPress={() => navigate(-1)}
+          style={styles.backButton}
+        >
+          <ArrowLeft size={24} color={colors.primary} />
+          <Text style={[styles.backText, { color: colors.primary }]}>Back</Text>
+        </TouchableOpacity>
+        <Text style={[styles.headerTitle, { color: colors.text }]}>
+          {course.code}
+        </Text>
+      </View>
       <ScrollView
         style={[styles.container, { backgroundColor: colors.background }]}
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.header}>
-          <View
-            style={[
-              styles.colorBar,
-              { backgroundColor: course.color },
-            ]}
-          />
+          <View style={[styles.colorBar, { backgroundColor: course.color }]} />
           <View style={styles.headerContent}>
             <Text style={[styles.courseName, { color: colors.text }]}>
               {course.name}
@@ -104,9 +108,24 @@ export default function CourseDetailScreen() {
             </Text>
             {courseAssignments.map((assignment) => {
               const formatDueDate = (date) => {
-                const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+                const months = [
+                  "Jan",
+                  "Feb",
+                  "Mar",
+                  "Apr",
+                  "May",
+                  "Jun",
+                  "Jul",
+                  "Aug",
+                  "Sep",
+                  "Oct",
+                  "Nov",
+                  "Dec",
+                ];
                 const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-                return `${days[date.getDay()]}, ${months[date.getMonth()]} ${date.getDate()}`;
+                return `${days[date.getDay()]}, ${
+                  months[date.getMonth()]
+                } ${date.getDate()}`;
               };
 
               const getTypeColor = (type) => {
@@ -141,7 +160,11 @@ export default function CourseDetailScreen() {
               const getStatusBadge = (status) => {
                 switch (status) {
                   case "submitted":
-                    return { bg: "#DBEAFE", text: "#1E40AF", label: "Submitted" };
+                    return {
+                      bg: "#DBEAFE",
+                      text: "#1E40AF",
+                      label: "Submitted",
+                    };
                   case "graded":
                     return { bg: "#D1FAE5", text: "#065F46", label: "Graded" };
                   default:
@@ -157,39 +180,66 @@ export default function CourseDetailScreen() {
                   key={assignment.id}
                   style={[
                     styles.assignmentCard,
-                    { backgroundColor: colors.card, borderColor: colors.border },
+                    {
+                      backgroundColor: colors.card,
+                      borderColor: colors.border,
+                    },
                   ]}
                   activeOpacity={0.7}
                 >
                   <View style={styles.assignmentHeader}>
                     <View style={styles.badgeRow}>
                       <View
-                        style={[styles.typeBadge, { backgroundColor: typeInfo.bg }]}
+                        style={[
+                          styles.typeBadge,
+                          { backgroundColor: typeInfo.bg },
+                        ]}
                       >
-                        <Text style={[styles.typeText, { color: typeInfo.text }]}>
+                        <Text
+                          style={[styles.typeText, { color: typeInfo.text }]}
+                        >
                           {typeInfo.label}
                         </Text>
                       </View>
                       <View
-                        style={[styles.statusBadge, { backgroundColor: statusInfo.bg }]}
+                        style={[
+                          styles.statusBadge,
+                          { backgroundColor: statusInfo.bg },
+                        ]}
                       >
-                        <Text style={[styles.statusText, { color: statusInfo.text }]}>
+                        <Text
+                          style={[
+                            styles.statusText,
+                            { color: statusInfo.text },
+                          ]}
+                        >
                           {statusInfo.label}
                         </Text>
                       </View>
                     </View>
                     {assignment.grade !== undefined && (
-                      <View style={[styles.gradeBadge, { backgroundColor: colors.primary + "20" }]}>
-                        <Text style={[styles.gradeText, { color: colors.primary }]}>
+                      <View
+                        style={[
+                          styles.gradeBadge,
+                          { backgroundColor: colors.primary + "20" },
+                        ]}
+                      >
+                        <Text
+                          style={[styles.gradeText, { color: colors.primary }]}
+                        >
                           {assignment.grade}%
                         </Text>
                       </View>
                     )}
                   </View>
-                  <Text style={[styles.assignmentTitle, { color: colors.text }]}>
+                  <Text
+                    style={[styles.assignmentTitle, { color: colors.text }]}
+                  >
                     {assignment.title}
                   </Text>
-                  <Text style={[styles.dueDate, { color: colors.textSecondary }]}>
+                  <Text
+                    style={[styles.dueDate, { color: colors.textSecondary }]}
+                  >
                     Due: {formatDueDate(assignment.dueDate)}
                   </Text>
                 </TouchableOpacity>
@@ -216,7 +266,9 @@ export default function CourseDetailScreen() {
                 ]}
                 activeOpacity={0.7}
                 onPress={() => {
-                  console.log(`Navigate to ${item.label} for course ${course.code}`);
+                  console.log(
+                    `Navigate to ${item.label} for course ${course.code}`
+                  );
                 }}
               >
                 <View style={styles.menuItemContent}>
@@ -360,5 +412,25 @@ const styles = StyleSheet.create({
   },
   dueDate: {
     fontSize: 14,
+  },
+  headerBar: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 16,
+    borderBottomWidth: 1,
+  },
+  backButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginRight: 16,
+  },
+  backText: {
+    fontSize: 16,
+    color: "#007AFF",
+    marginLeft: 4,
+  },
+  headerTitle: {
+    fontSize: 18,
+    fontWeight: "700",
   },
 });

@@ -7,21 +7,21 @@ import {
   View,
 } from "react-native";
 import { ChevronDown, ChevronUp } from "lucide-react-native";
-import { useRouter } from "expo-router";
+import { useNavigate } from "react-router-dom";
 
 import { useTheme } from "@/constants/ThemeContext";
 import { assignments, courses } from "@/mocks/courses";
 
 export default function MyCoursesScreen() {
   const { colors } = useTheme();
-  const router = useRouter();
+  const navigate = useNavigate();
   const [showAllAssignments, setShowAllAssignments] = useState(false);
 
   const now = new Date();
   const startOfWeek = new Date(now);
   startOfWeek.setDate(now.getDate() - now.getDay());
   startOfWeek.setHours(0, 0, 0, 0);
-  
+
   const endOfWeek = new Date(startOfWeek);
   endOfWeek.setDate(startOfWeek.getDate() + 7);
 
@@ -33,18 +33,33 @@ export default function MyCoursesScreen() {
     (a) => a.dueDate >= startOfWeek && a.dueDate < endOfWeek
   );
 
-  const displayAssignments = showAllAssignments ? upcomingAssignments : thisWeekAssignments;
+  const displayAssignments = showAllAssignments
+    ? upcomingAssignments
+    : thisWeekAssignments;
 
   const getWeekRange = () => {
     const start = new Date(startOfWeek);
     const end = new Date(endOfWeek);
     end.setDate(end.getDate() - 1);
-    
+
     const formatDate = (date) => {
-      const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+      const months = [
+        "Jan",
+        "Feb",
+        "Mar",
+        "Apr",
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sep",
+        "Oct",
+        "Nov",
+        "Dec",
+      ];
       return `${months[date.getMonth()]} ${date.getDate()}`;
     };
-    
+
     return `${formatDate(start)} - ${formatDate(end)}`;
   };
 
@@ -89,7 +104,13 @@ export default function MyCoursesScreen() {
   };
 
   return (
-    <ScrollView style={[styles.container, { backgroundColor: colors.backgroundSecondary }]} showsVerticalScrollIndicator={false}>
+    <ScrollView
+      style={[
+        styles.container,
+        { backgroundColor: colors.backgroundSecondary },
+      ]}
+      showsVerticalScrollIndicator={false}
+    >
       <View style={styles.section}>
         <View style={styles.weekHeaderContainer}>
           <View>
@@ -104,7 +125,10 @@ export default function MyCoursesScreen() {
           </View>
           <TouchableOpacity
             onPress={() => setShowAllAssignments(!showAllAssignments)}
-            style={[styles.expandButton, { backgroundColor: colors.card, borderColor: colors.border }]}
+            style={[
+              styles.expandButton,
+              { backgroundColor: colors.card, borderColor: colors.border },
+            ]}
             activeOpacity={0.7}
           >
             <Text style={[styles.expandButtonText, { color: colors.primary }]}>
@@ -118,8 +142,17 @@ export default function MyCoursesScreen() {
           </TouchableOpacity>
         </View>
         {displayAssignments.length === 0 ? (
-          <View style={[styles.emptyState, { backgroundColor: colors.card, borderColor: colors.border }]}>
-            <Text style={[styles.emptyStateText, { color: colors.textSecondary }]}>🎉 No assignments this week!</Text>
+          <View
+            style={[
+              styles.emptyState,
+              { backgroundColor: colors.card, borderColor: colors.border },
+            ]}
+          >
+            <Text
+              style={[styles.emptyStateText, { color: colors.textSecondary }]}
+            >
+              🎉 No assignments this week!
+            </Text>
           </View>
         ) : (
           displayAssignments.map((assignment) => {
@@ -147,7 +180,11 @@ export default function MyCoursesScreen() {
                       { backgroundColor: course?.color || "#6B7280" },
                     ]}
                   />
-                  <Text style={[styles.courseCode, { color: colors.textSecondary }]}>{course?.code}</Text>
+                  <Text
+                    style={[styles.courseCode, { color: colors.textSecondary }]}
+                  >
+                    {course?.code}
+                  </Text>
                   <View
                     style={[styles.typeBadge, { backgroundColor: typeInfo.bg }]}
                   >
@@ -156,9 +193,14 @@ export default function MyCoursesScreen() {
                     </Text>
                   </View>
                 </View>
-                <Text style={[styles.assignmentTitle, { color: colors.text }]}>{assignment.title}</Text>
+                <Text style={[styles.assignmentTitle, { color: colors.text }]}>
+                  {assignment.title}
+                </Text>
                 <Text
-                  style={[{ color: colors.textSecondary }, isUrgent && { color: colors.error, fontWeight: "600" }]}
+                  style={[
+                    { color: colors.textSecondary },
+                    isUrgent && { color: colors.error, fontWeight: "600" },
+                  ]}
                 >
                   {formatDueDate(assignment.dueDate)}
                 </Text>
@@ -169,37 +211,65 @@ export default function MyCoursesScreen() {
       </View>
 
       <View style={styles.section}>
-        <Text style={[styles.sectionTitle, { color: colors.text }]}>My Courses</Text>
+        <Text style={[styles.sectionTitle, { color: colors.text }]}>
+          My Courses
+        </Text>
         {courses.map((course) => (
           <TouchableOpacity
             key={course.id}
-            style={[styles.courseCard, { backgroundColor: colors.card, borderColor: colors.border }]}
+            style={[
+              styles.courseCard,
+              { backgroundColor: colors.card, borderColor: colors.border },
+            ]}
             activeOpacity={0.7}
-            onPress={() => router.push(`/course/${course.id}`)}
+            onPress={() => navigate(`/course/${course.id}`)}
           >
             <View
-              style={[
-                styles.courseColorBar,
-                { backgroundColor: course.color },
-              ]}
+              style={[styles.courseColorBar, { backgroundColor: course.color }]}
             />
             <View style={styles.courseContent}>
               <View style={styles.courseHeader}>
                 <View>
-                  <Text style={[styles.courseCode, { color: colors.textSecondary }]}>{course.code}</Text>
-                  <Text style={[styles.courseName, { color: colors.text }]}>{course.name}</Text>
+                  <Text
+                    style={[styles.courseCode, { color: colors.textSecondary }]}
+                  >
+                    {course.code}
+                  </Text>
+                  <Text style={[styles.courseName, { color: colors.text }]}>
+                    {course.name}
+                  </Text>
                 </View>
-                <View style={[styles.creditsContainer, { backgroundColor: colors.backgroundSecondary }]}>
-                  <Text style={[styles.creditsText, { color: colors.primary }]}>{course.credits}</Text>
-                  <Text style={[styles.creditsLabel, { color: colors.textSecondary }]}>credits</Text>
+                <View
+                  style={[
+                    styles.creditsContainer,
+                    { backgroundColor: colors.backgroundSecondary },
+                  ]}
+                >
+                  <Text style={[styles.creditsText, { color: colors.primary }]}>
+                    {course.credits}
+                  </Text>
+                  <Text
+                    style={[
+                      styles.creditsLabel,
+                      { color: colors.textSecondary },
+                    ]}
+                  >
+                    credits
+                  </Text>
                 </View>
               </View>
               <View style={styles.courseDetails}>
-                <Text style={[styles.instructor, { color: colors.text }]}>{course.instructor}</Text>
-                <Text style={[styles.schedule, { color: colors.textSecondary }]}>
+                <Text style={[styles.instructor, { color: colors.text }]}>
+                  {course.instructor}
+                </Text>
+                <Text
+                  style={[styles.schedule, { color: colors.textSecondary }]}
+                >
                   {course.schedule.days.join(", ")} • {course.schedule.time}
                 </Text>
-                <Text style={[styles.room, { color: colors.textSecondary }]}>{course.room}</Text>
+                <Text style={[styles.room, { color: colors.textSecondary }]}>
+                  {course.room}
+                </Text>
               </View>
             </View>
           </TouchableOpacity>

@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import {
   Alert,
+  Modal,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
+  TextInput,
 } from "react-native";
 
 import {
@@ -14,12 +16,19 @@ import {
   Calendar,
   CalendarDays,
   ChevronRight,
+  ChevronDown,
   Clock,
   GraduationCap,
   ShoppingCart,
   Trash2,
   Users,
   XCircle,
+  ChevronUp,
+  Search,
+  CheckSquare,
+  Square,
+  Video,
+  MapPin
 } from "lucide-react-native";
 
 import { useTheme } from "@/constants/ThemeContext";
@@ -146,8 +155,11 @@ function TabButton({
 }
 
 function AcademicRecords({ colors }) {
+  const [showAll, setShowAll] = useState(false);
   const inProgress = currentGrades.filter((g) => g.status === "in-progress");
   const completed = currentGrades.filter((g) => g.status === "completed");
+
+  const displayedCompleted = showAll ? completed : completed.slice(0, 4);
 
   const getGradeColor = (gradeStr) => {
     if (gradeStr.startsWith("A")) return colors.success;
@@ -216,24 +228,43 @@ function AcademicRecords({ colors }) {
         </View>
       ))}
 
-      <View style={[styles.sectionHeader, { marginTop: 24 }]}>
-        <BookOpen size={20} color={colors.text} />
-        <Text style={[styles.sectionTitle, { color: colors.text }]}>
-          Completed Courses
-        </Text>
-        <View
-          style={[
-            styles.countBadge,
-            { backgroundColor: colors.backgroundSecondary },
-          ]}
-        >
-          <Text style={[styles.countText, { color: colors.textSecondary }]}>
-            {completed.length}
+      <View style={[styles.sectionHeader, { marginTop: 24, justifyContent: 'space-between' }]}>
+        <View style={styles.headerTitleGroup}>
+          <BookOpen size={20} color={colors.text} />
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>
+            Completed Courses
           </Text>
+          <View
+            style={[
+              styles.countBadge,
+              { backgroundColor: colors.backgroundSecondary },
+            ]}
+          >
+            <Text style={[styles.countText, { color: colors.textSecondary }]}>
+              {completed.length}
+            </Text>
+          </View>
         </View>
+
+        {completed.length > 4 && (
+          <TouchableOpacity 
+            onPress={() => setShowAll(!showAll)}
+            style={styles.headerToggleButton}
+            activeOpacity={0.7}
+          >
+            <Text style={[styles.headerToggleText, { color: colors.primary }]}>
+              {showAll ? "Collapse" : "Show All"}
+            </Text>
+            {showAll ? (
+              <ChevronUp size={16} color={colors.primary} />
+            ) : (
+              <ChevronDown size={16} color={colors.primary} />
+            )}
+          </TouchableOpacity>
+        )}
       </View>
 
-      {completed.map((grade) => (
+      {displayedCompleted.map((grade) => (
         <View
           key={grade.courseId}
           style={[
@@ -278,7 +309,20 @@ function AcademicRecords({ colors }) {
 }
 
 function ShoppingCartSection({ colors }) {
+  const [selectedIndices, setSelectedIndices] = useState([]); // Use an array for multiple selections
+  const [searchQuery, setSearchQuery] = useState("");
+  const [modalVisible, setModalVisible] = useState(false);
   const totalCredits = cartCourses.reduce((sum, c) => sum + c.credits, 0);
+
+  const toggleSelection = (index) => {
+    setSelectedIndices((prev) => {
+      if (prev.includes(index)) {
+        return prev.filter((i) => i !== index); // Deselect if already selected
+      } else {
+        return [...prev, index]; // Select if not selected
+      }
+    });
+  };
 
   const handleRemove = (course) => {
     Alert.alert("Remove Course", `Remove ${course.courseCode} from cart?`, [
@@ -286,6 +330,28 @@ function ShoppingCartSection({ colors }) {
       { text: "Remove", style: "destructive" },
     ]);
   };
+
+  const handleVerify = () => {
+    Alert.alert("Verify Courses", "Checking course requirements...");
+  };
+
+  const initiateEnroll = () => {
+    if (selectedIndices.length === 0) {
+      Alert.alert("Enroll", "Please select at least one course to enroll.");
+      return;
+    }
+    setModalVisible(true);
+  };
+
+  const confirmEnroll = () => {
+    setModalVisible(false);
+    console.log("Enrolled in indices:", selectedIndices);
+    // Logic to actually enroll
+  };
+
+  const selectedCoursesText = selectedIndices.length > 0 
+    ? selectedIndices.map(i => cartCourses[i].courseCode).join(", ")
+    : "";
 
   return (
     <View>
@@ -298,7 +364,7 @@ function ShoppingCartSection({ colors }) {
         <View style={styles.cartHeaderContent}>
           <View>
             <Text style={[styles.cartSemester, { color: colors.text }]}>
-              Fall 2025
+              2025-26 Spring (2255) Undergraduate
             </Text>
             <Text
               style={[styles.cartSubtitle, { color: colors.textSecondary }]}
@@ -306,12 +372,18 @@ function ShoppingCartSection({ colors }) {
               {cartCourses.length} courses • {totalCredits} credits
             </Text>
           </View>
-          <TouchableOpacity
-            style={[styles.enrollButton, { backgroundColor: colors.primary }]}
-            activeOpacity={0.8}
-          >
-            <Text style={styles.enrollButtonText}>Enroll All</Text>
-          </TouchableOpacity>
+        </View>
+        <View style={[styles.cartSearchBar, { backgroundColor: colors.backgroundSecondary, borderColor: colors.border }]}>
+            <TextInput 
+              style={[styles.cartSearchInput, { color: colors.text }]}
+              placeholder="Search courses..."
+              placeholderTextColor={colors.textSecondary}
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+            />
+            <TouchableOpacity style={styles.cartSearchButton}>
+               <Search size={20} color={colors.primary} />
+            </TouchableOpacity>
         </View>
       </View>
 
@@ -331,104 +403,176 @@ function ShoppingCartSection({ colors }) {
           </Text>
         </View>
       ) : (
-        cartCourses.map((course) => (
-          <View
-            key={course.courseId}
-            style={[
-              styles.cartCard,
-              { backgroundColor: colors.card, borderColor: colors.border },
-            ]}
-          >
-            <View style={styles.cartCardContent}>
-              <View style={styles.cartCourseInfo}>
-                <View style={styles.cartCourseHeader}>
-                  <Text
-                    style={[styles.courseCode, { color: colors.textSecondary }]}
-                  >
-                    {course.courseCode}
-                  </Text>
-                  <View
-                    style={[
-                      styles.creditsBadge,
-                      { backgroundColor: colors.backgroundSecondary },
-                    ]}
-                  >
-                    <Text style={[styles.creditsText, { color: colors.text }]}>
-                      {course.credits} cr
+        <>
+          {cartCourses.map((course, index) => (
+            <View
+              key={index}
+              style={[
+                styles.cartCard,
+                { backgroundColor: colors.card, borderColor: colors.border },
+              ]}
+            >
+              <View style={styles.cartCardContent}>
+                <View style={styles.cartCourseInfo}>
+                  <View style={styles.cartCourseHeader}>
+                    <Text
+                      style={[styles.courseCode, { color: colors.textSecondary }]}
+                    >
+                      {course.courseCode}
                     </Text>
+                    <View
+                      style={[
+                        styles.creditsBadge,
+                        { backgroundColor: colors.backgroundSecondary },
+                      ]}
+                    >
+                      <Text style={[styles.creditsText, { color: colors.text }]}>
+                        {course.credits} cr
+                      </Text>
+                    </View>
+                  </View>
+                  <Text style={[styles.courseName, { color: colors.text }]}>
+                    {course.courseName}
+                  </Text>
+                  <View style={styles.cartDetails}>
+                    <View style={styles.cartDetailRow}>
+                      <Clock size={14} color={colors.textSecondary} />
+                      <Text
+                        style={[
+                          styles.cartDetailText,
+                          { color: colors.textSecondary },
+                        ]}
+                      >
+                        {course.days.join(", ")} • {course.startTime}-
+                        {course.endTime}
+                      </Text>
+                    </View>
+                    <View style={styles.cartDetailRow}>
+                      <Users size={14} color={colors.textSecondary} />
+                      <Text
+                        style={[
+                          styles.cartDetailText,
+                          { color: colors.textSecondary },
+                        ]}
+                      >
+                        {course.instructor}
+                      </Text>
+                    </View>
+                    <View style={styles.cartDetailRow}>
+                      <CalendarDays size={14} color={colors.textSecondary} />
+                      <Text
+                        style={[
+                          styles.cartDetailText,
+                          {
+                            color:
+                              course.seats < 10
+                                ? colors.error
+                                : course.seats < 20
+                                ? colors.warning
+                                : colors.success,
+                          },
+                        ]}
+                      >
+                        {course.seats}/{course.maxSeats} seats available
+                      </Text>
+                    </View>
                   </View>
                 </View>
-                <Text style={[styles.courseName, { color: colors.text }]}>
-                  {course.courseName}
-                </Text>
-                <View style={styles.cartDetails}>
-                  <View style={styles.cartDetailRow}>
-                    <Clock size={14} color={colors.textSecondary} />
-                    <Text
-                      style={[
-                        styles.cartDetailText,
-                        { color: colors.textSecondary },
-                      ]}
-                    >
-                      {course.days.join(", ")} • {course.startTime}-
-                      {course.endTime}
-                    </Text>
-                  </View>
-                  <View style={styles.cartDetailRow}>
-                    <Users size={14} color={colors.textSecondary} />
-                    <Text
-                      style={[
-                        styles.cartDetailText,
-                        { color: colors.textSecondary },
-                      ]}
-                    >
-                      {course.instructor}
-                    </Text>
-                  </View>
-                  <View style={styles.cartDetailRow}>
-                    <CalendarDays size={14} color={colors.textSecondary} />
-                    <Text
-                      style={[
-                        styles.cartDetailText,
-                        {
-                          color:
-                            course.seats < 10
-                              ? colors.error
-                              : course.seats < 20
-                              ? colors.warning
-                              : colors.success,
-                        },
-                      ]}
-                    >
-                      {course.seats}/{course.maxSeats} seats available
-                    </Text>
-                  </View>
+                
+                <View style={styles.cartActions}>
+                  <TouchableOpacity
+                    onPress={() => toggleSelection(index)}
+                    style={styles.actionButton}
+                    activeOpacity={0.7}
+                    hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                  >
+                    {selectedIndices.includes(index) ? (
+                      <CheckSquare size={24} color={colors.primary} />
+                    ) : (
+                      <Square size={24} color={colors.textSecondary} />
+                    )}
+                  </TouchableOpacity>
+                  
+                  <TouchableOpacity
+                    onPress={() => handleRemove(course)}
+                    style={styles.actionButton}
+                    activeOpacity={0.7}
+                    hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                  >
+                    <Trash2 size={20} color={colors.error} />
+                  </TouchableOpacity>
                 </View>
               </View>
-              <TouchableOpacity
-                onPress={() => handleRemove(course)}
-                style={[
-                  styles.removeButton,
-                  { backgroundColor: colors.error + "15" },
-                ]}
-                activeOpacity={0.7}
-              >
-                <Trash2 size={18} color={colors.error} />
-              </TouchableOpacity>
             </View>
+          ))}
+          
+          <View style={styles.cartFooter}>
+             <TouchableOpacity 
+                style={[styles.footerButton, styles.verifyButton, { borderColor: colors.primary }]}
+                onPress={handleVerify}
+             >
+                <Text style={[styles.footerButtonText, { color: colors.primary }]}>Verify Courses</Text>
+             </TouchableOpacity>
+             
+             <TouchableOpacity 
+                style={[styles.footerButton, styles.enrollActionButton, { backgroundColor: colors.primary }]}
+                onPress={initiateEnroll}
+             >
+                <Text style={[styles.footerButtonText, { color: '#fff' }]}>Enroll</Text>
+             </TouchableOpacity>
           </View>
-        ))
+
+          {/* Custom Confirmation Modal */}
+          <Modal
+            animationType="fade"
+            transparent={true}
+            visible={modalVisible}
+            onRequestClose={() => setModalVisible(false)}
+          >
+            <View style={styles.modalOverlay}>
+              <View style={[styles.modalView, { backgroundColor: colors.card, borderColor: colors.border }]}>
+                <Text style={[styles.modalTitle, { color: colors.text }]}>Confirm Enrollment</Text>
+                <Text style={[styles.modalText, { color: colors.textSecondary }]}>
+                  Are you sure you want to enroll in the selected {selectedIndices.length > 1 ? "courses" : "course"}?
+                  {"\n\n" + selectedCoursesText}
+                </Text>
+                <View style={styles.modalButtons}>
+                  <TouchableOpacity
+                    style={[styles.modalButton, styles.modalCancelButton]}
+                    onPress={() => setModalVisible(false)}
+                  >
+                    <Text style={[styles.modalButtonText, { color: colors.text }]}>Cancel</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[styles.modalButton, { backgroundColor: colors.primary }]}
+                    onPress={confirmEnroll}
+                  >
+                    <Text style={[styles.modalButtonText, { color: '#fff' }]}>Confirm</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          </Modal>
+        </>
       )}
     </View>
   );
 }
 
 function StarfishSection({ colors }) {
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedAppointment, setSelectedAppointment] = useState(null);
+
   const handleBookAppointment = (advisor, slot) => {
-    Alert.alert("Book Appointment", `Book with ${advisor.name} on ${slot}?`, [
-      { text: "Cancel", style: "cancel" },
-      { text: "Confirm", onPress: () => console.log("Appointment booked") },
-    ]);
+    setSelectedAppointment({ advisor, slot });
+    setModalVisible(true);
+  };
+
+  const confirmAppointment = (type) => {
+    // eslint-disable-next-line no-console
+    console.log(`Appointment booked: ${type} with ${selectedAppointment?.advisor.name} at ${selectedAppointment?.slot}`);
+    setModalVisible(false);
+    setSelectedAppointment(null);
   };
 
   const getRoleIcon = (role) => {
@@ -522,6 +666,50 @@ function StarfishSection({ colors }) {
           ))}
         </>
       )}
+
+      {/* Appointment Confirmation Modal */}
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalView, { backgroundColor: colors.card, borderColor: colors.border }]}>
+            <Text style={[styles.modalTitle, { color: colors.text }]}>Confirm Appointment</Text>
+            {selectedAppointment && (
+              <Text style={[styles.modalText, { color: colors.textSecondary }]}>
+                Schedule a meeting with {selectedAppointment.advisor.name} on {selectedAppointment.slot}?
+              </Text>
+            )}
+            
+            <View style={styles.appointmentOptions}>
+              <TouchableOpacity 
+                style={[styles.optionButton, { borderColor: colors.primary, borderWidth: 1 }]}
+                onPress={() => confirmAppointment('Online')}
+              >
+                <Video size={24} color={colors.primary} />
+                <Text style={[styles.optionText, { color: colors.primary }]}>Online Meeting</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity 
+                style={[styles.optionButton, { borderColor: colors.primary, borderWidth: 1 }]}
+                onPress={() => confirmAppointment('In Person')}
+              >
+                <MapPin size={24} color={colors.primary} />
+                <Text style={[styles.optionText, { color: colors.primary }]}>In Person</Text>
+              </TouchableOpacity>
+            </View>
+
+            <TouchableOpacity
+              style={styles.modalCancelLink}
+              onPress={() => setModalVisible(false)}
+            >
+              <Text style={[styles.modalCancelText, { color: colors.textSecondary }]}>Cancel</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -780,6 +968,11 @@ const styles = StyleSheet.create({
     gap: 8,
     marginBottom: 12,
   },
+  headerTitleGroup: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
   sectionTitle: {
     fontSize: 18,
     fontWeight: "700",
@@ -836,6 +1029,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+    marginBottom: 12,
   },
   cartSemester: {
     fontSize: 18,
@@ -844,6 +1038,22 @@ const styles = StyleSheet.create({
   cartSubtitle: {
     fontSize: 13,
     marginTop: 2,
+  },
+  cartSearchBar: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    height: 40,
+  },
+  cartSearchInput: {
+    flex: 1,
+    fontSize: 14,
+    marginRight: 8,
+  },
+  cartSearchButton: {
+    padding: 4,
   },
   enrollButton: {
     paddingHorizontal: 20,
@@ -1067,5 +1277,122 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
     fontSize: 14,
     fontWeight: "600",
+  },
+  headerToggleButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+  },
+  headerToggleText: {
+    fontSize: 14,
+    fontWeight: "600",
+  },
+  cartActions: {
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    gap: 60, // Increased gap from 24 to 32
+    paddingLeft: 4,
+  },
+  actionButton: {
+    padding: 4,
+  },
+  cartFooter: {
+    flexDirection: 'row',
+    gap: 12,
+    marginTop: 12,
+  },
+  footerButton: {
+    flex: 1,
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  verifyButton: {
+    borderWidth: 1,
+    backgroundColor: 'transparent',
+  },
+  enrollActionButton: {
+    // bg color set inline
+  },
+  footerButtonText: {
+    fontWeight: '700',
+    fontSize: 15,
+  },
+  // Modal Styles
+  modalOverlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalView: {
+    width: '350px',
+    borderRadius: 16,
+    padding: 24,
+    borderWidth: 1,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    marginBottom: 12,
+  },
+  modalText: {
+    fontSize: 15,
+    textAlign: 'center',
+    marginBottom: 24,
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    gap: 12,
+    width: '300px',
+  },
+  modalButton: {
+    flex: 1,
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  modalCancelButton: {
+    backgroundColor: 'transparent',
+    borderWidth: 1,
+    borderColor: '#ccc',
+  },
+  modalButtonText: {
+    fontWeight: '600',
+    fontSize: 15,
+  },
+  appointmentOptions: {
+    flexDirection: 'row',
+    gap: 16,
+    marginBottom: 24,
+    width: '100%',
+  },
+  optionButton: {
+    flex: 1,
+    padding: 16,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+  },
+  optionText: {
+    fontWeight: '600',
+    fontSize: 14,
+    textAlign: 'center',
+  },
+  modalCancelLink: {
+    marginTop: 8,
+    padding: 8,
+  },
+  modalCancelText: {
+    fontSize: 15,
+    fontWeight: '500',
   },
 });

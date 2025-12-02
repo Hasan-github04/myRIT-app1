@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Outlet, NavLink } from "react-router-dom";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   BookOpen,
   GraduationCap,
@@ -8,10 +9,44 @@ import {
   Bell,
 } from "lucide-react-native";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
-import { useTheme } from "@/constants/ThemeContext";
+import { useTheme } from "@/context/ThemeContext";
+import { initialNotifications } from "@/mocks/notifications";
 
-export default function TabsLayout() {
+export default function TabsLayout({ onLogout }) {
   const { colors } = useTheme();
+  const [notifications, setNotifications] = useState(initialNotifications);
+
+  useEffect(() => {
+    const loadNotifications = async () => {
+      try {
+        const savedNotifications = await AsyncStorage.getItem("notifications");
+        if (savedNotifications !== null) {
+          setNotifications(JSON.parse(savedNotifications));
+        }
+      } catch (error) {
+        console.error("Failed to load notifications", error);
+      }
+    };
+
+    loadNotifications();
+  }, []);
+
+  useEffect(() => {
+    const saveNotifications = async () => {
+      try {
+        await AsyncStorage.setItem(
+          "notifications",
+          JSON.stringify(notifications)
+        );
+      } catch (error) {
+        console.error("Failed to save notifications", error);
+      }
+    };
+
+    saveNotifications();
+  }, [notifications]);
+
+  const unreadCount = notifications.filter((n) => !n.isRead).length;
 
   const tabs = [
     {
@@ -23,6 +58,7 @@ export default function TabsLayout() {
       name: "Notifications",
       path: "/notifications",
       icon: Bell,
+      badge: unreadCount > 0 ? unreadCount : null,
     },
     {
       name: "SIS",
@@ -44,7 +80,7 @@ export default function TabsLayout() {
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={styles.content}>
-        <Outlet />
+        <Outlet context={{ onLogout, notifications, setNotifications }} />
       </View>
       <View
         style={[
@@ -63,10 +99,22 @@ export default function TabsLayout() {
             >
               {({ isActive }) => (
                 <View style={styles.tabItem}>
-                  <Icon
-                    size={24}
-                    color={isActive ? colors.tint : colors.text}
-                  />
+                  <View>
+                    <Icon
+                      size={24}
+                      color={isActive ? colors.tint : colors.text}
+                    />
+                    {tab.badge && (
+                      <View
+                        style={[
+                          styles.badge,
+                          { backgroundColor: colors.primary },
+                        ]}
+                      >
+                        <Text style={styles.badgeText}>{tab.badge}</Text>
+                      </View>
+                    )}
+                  </View>
                   <Text
                     style={[
                       styles.tabLabel,
@@ -92,7 +140,8 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    overflow: "hidden",
+    overflow: "hidden", // Force child ScrollView to handle scrolling
+    width: "100%",
   },
   tabBar: {
     flexDirection: "row",
@@ -110,5 +159,22 @@ const styles = StyleSheet.create({
     fontSize: 10,
     marginTop: 4,
     fontWeight: "500",
+  },
+  badge: {
+    position: "absolute",
+    top: -4,
+    right: -6,
+    minWidth: 16,
+    height: 16,
+    borderRadius: 8,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 4,
+    zIndex: 1,
+  },
+  badgeText: {
+    color: "#FFFFFF",
+    fontSize: 10,
+    fontWeight: "700",
   },
 });

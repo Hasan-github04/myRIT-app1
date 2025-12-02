@@ -9,6 +9,7 @@ export const events = [
       "Meet with top tech companies including PWS, Petrofac, and more. Bring your resume and dress professionally!",
     organizer: "Career Services",
     attendees: 234,
+    isRSVP: false,
   },
   {
     id: "2",
@@ -29,6 +30,7 @@ export const events = [
       "Join us for board games, video games, and snacks! All students welcome. No experience necessary.",
     organizer: "Computer Science House",
     attendees: 45,
+    isRSVP: false,
   },
   {
     id: "4",
@@ -40,6 +42,7 @@ export const events = [
       "Annual RIT Esports Spring Tournament featuring League of Legends, Valorant, and Super Smash Bros. Register your team now!",
     organizer: "RIT Esports",
     attendees: 128,
+    isRSVP: false,
   },
   {
     id: "5",
@@ -60,6 +63,7 @@ export const events = [
       "RIT's annual Innovation and Creativity Festival. Showcase your projects, see amazing student work, and enjoy live performances!",
     organizer: "RIT Events",
     attendees: 1200,
+    isRSVP: false,
   },
   {
     id: "7",
@@ -71,5 +75,57 @@ export const events = [
       "Monthly meeting with guest speaker from IBM discussing career paths in cloud computing. Pizza will be provided!",
     organizer: "Women in Computing",
     attendees: 32,
+    isRSVP: false,
+  },
+];
+
+export const mockMessages = [
+  {
+    id: 1,
+    text: "Hey everyone! Has anyone started the assignment due Friday?",
+    sender: "Syed Wasti",
+    time: "10:30 AM",
+    isMe: false,
+    avatar: "SC",
+  },
+  {
+    id: 2,
+    text: "I just looked at it. Question 3 is confusing.",
+    sender: "Hashim Mohammed",
+    time: "10:32 AM",
+    isMe: false,
+    avatar: "MR",
+  },
+  {
+    id: 3,
+    text: "I think we need to use the formula from chapter 4.",
+    sender: "Yousef Diago",
+    time: "10:35 AM",
+    isMe: false,
+    avatar: "JP",
+  },
+  {
+    id: 4,
+    text: "Oh, that makes sense, Thanks.",
+    sender: "Syed Wasti",
+    time: "10:36 AM",
+    isMe: false,
+    avatar: "MR",
+  },
+  {
+    id: 5,
+    text: "I'm planning to work on it tonight if anyone wants to join a study session?",
+    sender: "You",
+    time: "10:40 AM",
+    isMe: true,
+    avatar: "ME",
+  },
+  {
+    id: 6,
+    text: "I'm down, Library at 6?",
+    sender: "Syed Wasit",
+    time: "10:42 AM",
+    isMe: false,
+    avatar: "SC",
   },
 ];

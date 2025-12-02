@@ -23,27 +23,36 @@ import {
   Send,
   Smile,
   Paperclip,
+  Check,
 } from "lucide-react-native";
 
-import { useTheme } from "@/constants/ThemeContext";
-import { events } from "@/mocks/community";
+import { useTheme } from "@/context/ThemeContext";
+import { events, mockMessages } from "@/mocks/community";
 import { courses } from "@/mocks/courses";
-
-const mockMessages = [
-  { id: 1, text: "Hey everyone! Has anyone started the assignment due Friday?", sender: "Syed Wasti", time: "10:30 AM", isMe: false, avatar: "SC" },
-  { id: 2, text: "I just looked at it. Question 3 is confusing.", sender: "Hashim Mohammed", time: "10:32 AM", isMe: false, avatar: "MR" },
-  { id: 3, text: "I think we need to use the formula from chapter 4.", sender: "Yousef Diago", time: "10:35 AM", isMe: false, avatar: "JP" },
-  { id: 4, text: "Oh, that makes sense, Thanks.", sender: "Syed Wasti", time: "10:36 AM", isMe: false, avatar: "MR" },
-  { id: 5, text: "I'm planning to work on it tonight if anyone wants to join a study session?", sender: "You", time: "10:40 AM", isMe: true, avatar: "ME" },
-  { id: 6, text: "I'm down, Library at 6?", sender: "Syed Wasit", time: "10:42 AM", isMe: false, avatar: "SC" },
-];
 
 export default function CommunityScreen() {
   const { colors } = useTheme();
   const [filter, setFilter] = useState("all");
   const [activeChat, setActiveChat] = useState(null);
+  const [eventsList, setEventsList] = useState(events);
 
-  const filteredEvents = events.filter((e) =>
+  const handleRSVP = (id) => {
+    setEventsList((prevEvents) =>
+      prevEvents.map((event) => {
+        if (event.id === id) {
+          const newIsRSVP = !event.isRSVP;
+          return {
+            ...event,
+            isRSVP: newIsRSVP,
+            attendees: newIsRSVP ? event.attendees + 1 : event.attendees - 1,
+          };
+        }
+        return event;
+      })
+    );
+  };
+
+  const filteredEvents = eventsList.filter((e) =>
     filter === "all" ? true : e.type === filter
   );
 
@@ -89,17 +98,30 @@ export default function CommunityScreen() {
 
   if (activeChat) {
     return (
-      <ChatView 
-        course={activeChat} 
-        onBack={() => setActiveChat(null)} 
-        colors={colors} 
+      <ChatView
+        course={activeChat}
+        onBack={() => setActiveChat(null)}
+        colors={colors}
       />
     );
   }
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.backgroundSecondary }]}>
-      <View style={[styles.filterContainer, { backgroundColor: colors.background, borderBottomColor: colors.border }]}>
+    <View
+      style={[
+        styles.container,
+        { backgroundColor: colors.backgroundSecondary },
+      ]}
+    >
+      <View
+        style={[
+          styles.filterContainer,
+          {
+            backgroundColor: colors.background,
+            borderBottomColor: colors.border,
+          },
+        ]}
+      >
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -148,17 +170,33 @@ export default function CommunityScreen() {
             {courses.map((course) => (
               <TouchableOpacity
                 key={course.id}
-                style={[styles.discussionCard, { backgroundColor: colors.card, borderColor: colors.border }]}
+                style={[
+                  styles.discussionCard,
+                  { backgroundColor: colors.card, borderColor: colors.border },
+                ]}
                 activeOpacity={0.7}
                 onPress={() => setActiveChat(course)}
               >
-                <View style={[styles.courseIcon, { backgroundColor: course.color }]}>
-                  <Text style={styles.courseIconText}>{course.code.substring(0, 2)}</Text>
+                <View
+                  style={[styles.courseIcon, { backgroundColor: course.color }]}
+                >
+                  <Text style={styles.courseIconText}>
+                    {course.code.substring(0, 2)}
+                  </Text>
                 </View>
                 <View style={styles.discussionInfo}>
-                  <Text style={[styles.discussionTitle, { color: colors.text }]}>{course.name}</Text>
-                  <Text style={[styles.discussionSubtitle, { color: colors.textSecondary }]}>
-                    {course.code} • {Math.floor(Math.random() * 5) + 1} new messages
+                  <Text
+                    style={[styles.discussionTitle, { color: colors.text }]}
+                  >
+                    {course.name}
+                  </Text>
+                  <Text
+                    style={[
+                      styles.discussionSubtitle,
+                      { color: colors.textSecondary },
+                    ]}
+                  >
+                    {course.code} • 3 new messages
                   </Text>
                 </View>
                 <MessageCircle size={20} color={colors.primary} />
@@ -169,7 +207,10 @@ export default function CommunityScreen() {
           filteredEvents.map((event) => (
             <TouchableOpacity
               key={event.id}
-              style={[styles.eventCard, { backgroundColor: colors.card, borderColor: colors.border }]}
+              style={[
+                styles.eventCard,
+                { backgroundColor: colors.card, borderColor: colors.border },
+              ]}
               activeOpacity={0.7}
             >
               <View style={styles.eventHeader}>
@@ -184,11 +225,23 @@ export default function CommunityScreen() {
                     {event.type.toUpperCase()}
                   </Text>
                 </View>
-                <Text style={[styles.eventDate, { color: colors.textSecondary }]}>{formatDate(event.date)}</Text>
+                <Text
+                  style={[styles.eventDate, { color: colors.textSecondary }]}
+                >
+                  {formatDate(event.date)}
+                </Text>
               </View>
 
-              <Text style={[styles.eventTitle, { color: colors.text }]}>{event.title}</Text>
-              <Text style={[styles.eventDescription, { color: colors.textSecondary }]} numberOfLines={3}>
+              <Text style={[styles.eventTitle, { color: colors.text }]}>
+                {event.title}
+              </Text>
+              <Text
+                style={[
+                  styles.eventDescription,
+                  { color: colors.textSecondary },
+                ]}
+                numberOfLines={3}
+              >
                 {event.description}
               </Text>
 
@@ -197,25 +250,74 @@ export default function CommunityScreen() {
                   {event.location && (
                     <View style={styles.eventDetailItem}>
                       <MapPin size={14} color={colors.textSecondary} />
-                      <Text style={[styles.eventDetailText, { color: colors.textSecondary }]}>
+                      <Text
+                        style={[
+                          styles.eventDetailText,
+                          { color: colors.textSecondary },
+                        ]}
+                      >
                         {event.location}
                       </Text>
                     </View>
                   )}
                   <View style={styles.eventDetailItem}>
                     <Users size={14} color={colors.textSecondary} />
-                    <Text style={[styles.eventDetailText, { color: colors.textSecondary }]}>
+                    <Text
+                      style={[
+                        styles.eventDetailText,
+                        { color: colors.textSecondary },
+                      ]}
+                    >
                       {event.organizer}
                     </Text>
                   </View>
                 </View>
-                {event.attendees && (
-                  <View style={[styles.attendeesContainer, { backgroundColor: colors.backgroundSecondary }]}>
-                    <Text style={[styles.attendeesText, { color: colors.text }]}>
-                      {event.attendees} attending
-                    </Text>
-                  </View>
-                )}
+
+                <View style={styles.eventActions}>
+                  {event.attendees && (
+                    <View
+                      style={[
+                        styles.attendeesContainer,
+                        { backgroundColor: colors.backgroundSecondary },
+                      ]}
+                    >
+                      <Text
+                        style={[styles.attendeesText, { color: colors.text }]}
+                      >
+                        {event.attendees} attending
+                      </Text>
+                    </View>
+                  )}
+
+                  {event.type !== "announcement" && (
+                    <TouchableOpacity
+                      style={[
+                        styles.rsvpButton,
+                        {
+                          backgroundColor: event.isRSVP
+                            ? colors.success + "20"
+                            : colors.primary,
+                        },
+                      ]}
+                      onPress={() => handleRSVP(event.id)}
+                      activeOpacity={0.7}
+                    >
+                      {event.isRSVP && (
+                        <Check size={14} color={colors.success} />
+                      )}
+                      <Text
+                        style={[
+                          styles.rsvpButtonText,
+                          {
+                            color: event.isRSVP ? colors.success : "#FFFFFF",
+                          },
+                        ]}
+                      >
+                        {event.isRSVP ? "Going" : "RSVP"}
+                      </Text>
+                    </TouchableOpacity>
+                  )}
+                </View>
               </View>
             </TouchableOpacity>
           ))
@@ -233,20 +335,43 @@ function ChatView({ course, onBack, colors }) {
   const scrollViewRef = useRef();
 
   // Theme Constants for Chat
-  const isDark = mode === 'dark';
-  const chatBgColor = isDark ? '#0B141A' : '#ECE5DD';
-  const inputBgColor = isDark ? '#202C33' : '#F0F0F0';
-  const inputFieldColor = isDark ? '#2A3942' : '#FFFFFF';
-  const myBubbleColor = isDark ? '#005C4B' : '#DCF8C6';
-  const otherBubbleColor = isDark ? '#202C33' : '#FFFFFF';
-  const dateBadgeBg = isDark ? '#202C33' : '#D1D7DB';
-  const dateBadgeText = isDark ? '#8696A0' : '#4B5563';
-  const timeColor = isDark ? '#8696A0' : '#999';
-  const iconColor = isDark ? '#8696A0' : '#808080';
+  const isDark = mode === "dark";
+  const chatBgColor = isDark ? "#0B141A" : "#ECE5DD"; // Keep dark bg
+  const inputBgColor = isDark ? "#1F2937" : "#F0F0F0"; // Gray-800
+  const inputFieldColor = isDark ? "#374151" : "#FFFFFF"; // Gray-700
+  const myBubbleColor = isDark ? "#F76902" : "#DCF8C6"; // RIT Orange for me
+  const otherBubbleColor = isDark ? "#1F2937" : "#FFFFFF"; // Gray-800 for others
+  const dateBadgeBg = isDark ? "#1F2937" : "#D1D7DB";
+  const dateBadgeText = isDark ? "#9CA3AF" : "#4B5563";
+  const timeColor = isDark ? "#D1D5DB" : "#999"; // Lighter gray for readability on orange/dark
+  const iconColor = isDark ? "#9CA3AF" : "#808080";
+
+  const getUserColor = (name) => {
+    const colors = [
+      "#E57373", // Red
+      "#F06292", // Pink
+      "#BA68C8", // Purple
+      "#9575CD", // Deep Purple
+      "#7986CB", // Indigo
+      "#64B5F6", // Blue
+      "#4FC3F7", // Light Blue
+      "#4DD0E1", // Cyan
+      "#4DB6AC", // Teal
+      "#81C784", // Green
+      "#AED581", // Light Green
+      "#FFD54F", // Amber
+      "#FFB74D", // Orange
+      "#FF8A65", // Deep Orange
+    ];
+    let hash = 0;
+    for (let i = 0; i < name.length; i++) {
+      hash = name.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    return colors[Math.abs(hash) % colors.length];
+  };
 
   return (
-    <View style={[styles.chatContainer, { backgroundColor: chatBgColor }]}> 
-      
+    <View style={[styles.chatContainer, { backgroundColor: chatBgColor }]}>
       {/* Header */}
       <View style={[styles.chatHeader, { backgroundColor: colors.primary }]}>
         <View style={styles.chatHeaderLeft}>
@@ -254,7 +379,9 @@ function ChatView({ course, onBack, colors }) {
             <ArrowLeft size={24} color="#FFF" />
           </TouchableOpacity>
           <View style={styles.chatHeaderInfo}>
-            <Text style={styles.chatTitle} numberOfLines={1}>{course.name}</Text>
+            <Text style={styles.chatTitle} numberOfLines={1}>
+              {course.name}
+            </Text>
             <Text style={styles.chatSubtitle}>{course.code} • 24 members</Text>
           </View>
         </View>
@@ -272,52 +399,83 @@ function ChatView({ course, onBack, colors }) {
       </View>
 
       {/* Messages */}
-      <ScrollView 
+      <ScrollView
         style={styles.chatMessages}
         ref={scrollViewRef}
-        onContentSizeChange={() => scrollViewRef.current?.scrollToEnd({ animated: false })}
+        onContentSizeChange={() =>
+          scrollViewRef.current?.scrollToEnd({ animated: false })
+        }
       >
         <View style={styles.dateBadgeContainer}>
           <View style={[styles.dateBadge, { backgroundColor: dateBadgeBg }]}>
-            <Text style={[styles.dateBadgeText, { color: dateBadgeText }]}>Today</Text>
+            <Text style={[styles.dateBadgeText, { color: dateBadgeText }]}>
+              Today
+            </Text>
           </View>
         </View>
 
         {mockMessages.map((msg) => (
-          <View 
-            key={msg.id} 
+          <View
+            key={msg.id}
             style={[
-              styles.messageRow, 
-              msg.isMe ? styles.messageRowRight : styles.messageRowLeft
+              styles.messageRow,
+              msg.isMe ? styles.messageRowRight : styles.messageRowLeft,
             ]}
           >
             {!msg.isMe && (
-              <View style={[styles.messageAvatar, { backgroundColor: colors.primary }]}>
+              <View
+                style={[
+                  styles.messageAvatar,
+                  { backgroundColor: getUserColor(msg.sender) },
+                ]}
+              >
                 <Text style={styles.messageAvatarText}>{msg.avatar}</Text>
               </View>
             )}
-            <View 
+            <View
               style={[
-                styles.messageBubble, 
-                { backgroundColor: msg.isMe ? myBubbleColor : otherBubbleColor }
+                styles.messageBubble,
+                {
+                  backgroundColor: msg.isMe ? myBubbleColor : otherBubbleColor,
+                },
               ]}
             >
-              {!msg.isMe && <Text style={[styles.senderName, { color: colors.primary }]}>{msg.sender}</Text>}
-              <Text style={[styles.messageText, { color: colors.text }]}>{msg.text}</Text>
-              <Text style={[styles.messageTime, { color: timeColor }]}>{msg.time}</Text>
+              {!msg.isMe && (
+                <Text
+                  style={[
+                    styles.senderName,
+                    { color: getUserColor(msg.sender) },
+                  ]}
+                >
+                  {msg.sender}
+                </Text>
+              )}
+              <Text style={[styles.messageText, { color: colors.text }]}>
+                {msg.text}
+              </Text>
+              <Text style={[styles.messageTime, { color: timeColor }]}>
+                {msg.time}
+              </Text>
             </View>
           </View>
         ))}
-        <View style={{height: 10}} />
+        <View style={{ height: 10 }} />
       </ScrollView>
 
       {/* Input Area */}
-      <KeyboardAvoidingView 
+      <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         keyboardVerticalOffset={Platform.OS === "ios" ? 20 : 0}
       >
-        <View style={[styles.inputContainer, { backgroundColor: inputBgColor }]}>
-          <View style={[styles.inputFieldContainer, { backgroundColor: inputFieldColor }]}>
+        <View
+          style={[styles.inputContainer, { backgroundColor: inputBgColor }]}
+        >
+          <View
+            style={[
+              styles.inputFieldContainer,
+              { backgroundColor: inputFieldColor },
+            ]}
+          >
             <TouchableOpacity style={styles.inputIcon}>
               <Smile size={24} color={iconColor} />
             </TouchableOpacity>
@@ -333,7 +491,9 @@ function ChatView({ course, onBack, colors }) {
               <Paperclip size={20} color={iconColor} />
             </TouchableOpacity>
           </View>
-          <TouchableOpacity style={[styles.sendButton, { backgroundColor: colors.primary }]}>
+          <TouchableOpacity
+            style={[styles.sendButton, { backgroundColor: colors.primary }]}
+          >
             <Send size={20} color="#FFF" />
           </TouchableOpacity>
         </View>
@@ -342,26 +502,29 @@ function ChatView({ course, onBack, colors }) {
   );
 }
 
-const FilterButton = ({
-  label,
-  active,
-  onPress,
-  colors,
-}) => (
+const FilterButton = ({ label, active, onPress, colors }) => (
   <TouchableOpacity
     style={[
       styles.filterButton,
-      { backgroundColor: colors.backgroundSecondary, borderColor: colors.border },
-      active && { backgroundColor: colors.primary, borderColor: colors.primary },
+      {
+        backgroundColor: colors.backgroundSecondary,
+        borderColor: colors.border,
+      },
+      active && {
+        backgroundColor: colors.primary,
+        borderColor: colors.primary,
+      },
     ]}
     onPress={onPress}
     activeOpacity={0.7}
   >
-    <Text style={[
-      styles.filterButtonText,
-      { color: colors.text },
-      active && { color: "#FFFFFF" },
-    ]}>
+    <Text
+      style={[
+        styles.filterButtonText,
+        { color: colors.text },
+        active && { color: "#FFFFFF" },
+      ]}
+    >
       {label}
     </Text>
   </TouchableOpacity>
@@ -375,9 +538,10 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
   },
   filterScroll: {
-    paddingHorizontal: 16,
+    paddingHorizontal: 12,
     paddingVertical: 12,
-    gap: 8,
+    paddingRight: 48, // Extra padding to prevent cutoff
+    gap: 6,
   },
   filterButton: {
     paddingHorizontal: 16,
@@ -459,14 +623,30 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: "600",
   },
-  
+  eventActions: {
+    alignItems: "flex-end",
+    gap: 8,
+  },
+  rsvpButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+  },
+  rsvpButtonText: {
+    fontSize: 12,
+    fontWeight: "700",
+  },
+
   // Discussion / Course List Styles
   courseList: {
     gap: 12,
   },
   discussionCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     padding: 16,
     borderRadius: 12,
     borderWidth: 1,
@@ -476,20 +656,20 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   courseIconText: {
-    color: '#FFF',
+    color: "#FFF",
     fontSize: 16,
-    fontWeight: '700',
+    fontWeight: "700",
   },
   discussionInfo: {
     flex: 1,
   },
   discussionTitle: {
     fontSize: 16,
-    fontWeight: '700',
+    fontWeight: "700",
     marginBottom: 4,
   },
   discussionSubtitle: {
@@ -501,16 +681,17 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   chatHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingTop: 50, // Status bar padding
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingTop: 16,
     paddingBottom: 12,
-    paddingHorizontal: 16,
+    paddingHorizontal: 12,
+    height: 64,
   },
   chatHeaderLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 8,
     flex: 1,
   },
@@ -522,27 +703,28 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   chatTitle: {
-    color: '#FFF',
+    color: "#FFF",
     fontSize: 16,
-    fontWeight: '700',
+    fontWeight: "700",
   },
   chatSubtitle: {
-    color: 'rgba(255, 255, 255, 0.8)',
+    color: "rgba(255, 255, 255, 0.8)",
     fontSize: 12,
   },
   chatHeaderRight: {
-    flexDirection: 'row',
-    gap: 20,
+    flexDirection: "row",
+    gap: 16,
   },
   headerIcon: {
     padding: 4,
   },
   chatMessages: {
     flex: 1,
-    padding: 16,
+    paddingHorizontal: 12,
+    paddingTop: 8,
   },
   dateBadgeContainer: {
-    alignItems: 'center',
+    alignItems: "center",
     marginVertical: 12,
   },
   dateBadge: {
@@ -552,37 +734,37 @@ const styles = StyleSheet.create({
   },
   dateBadgeText: {
     fontSize: 12,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   messageRow: {
-    marginBottom: 12,
-    flexDirection: 'row',
-    alignItems: 'flex-end',
+    marginBottom: 4, // Reduced spacing between messages
+    flexDirection: "row",
+    alignItems: "flex-end",
     gap: 8,
   },
   messageRowLeft: {
-    justifyContent: 'flex-start',
+    justifyContent: "flex-start",
   },
   messageRowRight: {
-    justifyContent: 'flex-end',
+    justifyContent: "flex-end",
   },
   messageAvatar: {
     width: 28,
     height: 28,
     borderRadius: 14,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     marginBottom: 2,
   },
   messageAvatarText: {
-    color: '#FFF',
+    color: "#FFF",
     fontSize: 10,
-    fontWeight: '700',
+    fontWeight: "700",
   },
   messageBubble: {
-    maxWidth: '75%',
-    padding: 8,
-    paddingHorizontal: 12,
+    maxWidth: "75%",
+    padding: 6,
+    paddingHorizontal: 10,
     borderRadius: 8,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
@@ -592,8 +774,8 @@ const styles = StyleSheet.create({
   },
   senderName: {
     fontSize: 12,
-    fontWeight: '700',
-    marginBottom: 4,
+    fontWeight: "700",
+    marginBottom: 2,
   },
   messageText: {
     fontSize: 15,
@@ -601,19 +783,22 @@ const styles = StyleSheet.create({
   },
   messageTime: {
     fontSize: 10,
-    alignSelf: 'flex-end',
-    marginTop: 4,
+    alignSelf: "flex-end",
+    marginTop: 2,
+    opacity: 0.7,
   },
   inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 8,
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 8,
+    paddingTop: 8,
+    paddingBottom: 4, // Reduced bottom padding
     gap: 8,
   },
   inputFieldContainer: {
     flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     borderRadius: 24,
     paddingHorizontal: 12,
     paddingVertical: 8,
@@ -624,6 +809,8 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginHorizontal: 8,
     maxHeight: 100,
+    paddingVertical: 0, // Remove default padding
+    textAlignVertical: "center", // Center text vertically
   },
   inputIcon: {
     padding: 4,
@@ -632,7 +819,7 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
 });

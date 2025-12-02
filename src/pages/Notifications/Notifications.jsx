@@ -1,4 +1,5 @@
 import React, { useState, useRef } from "react";
+import { useOutletContext } from "react-router-dom";
 import {
   ScrollView,
   StyleSheet,
@@ -9,72 +10,15 @@ import {
   PanResponder,
 } from "react-native";
 
-import { useTheme } from "@/constants/ThemeContext";
+import { useTheme } from "@/context/ThemeContext";
 import { courses } from "@/mocks/courses";
 import { RotateCcw } from "lucide-react-native";
 
-const initialNotifications = [
-  {
-    id: "1",
-    type: "grade",
-    title: "New Grade Posted",
-    message: "SQL Query Homework - 95/100",
-    timestamp: new Date(Date.now() - 3 * 60 * 60 * 1000),
-    courseId: "1",
-    isRead: false,
-  },
-  {
-    id: "2",
-    type: "assignment",
-    title: "Assignment Due Soon",
-    message: "CSS Styling Quiz due tomorrow",
-    timestamp: new Date(Date.now() - 5 * 60 * 60 * 1000),
-    courseId: "2",
-    isRead: false,
-  },
-  {
-    id: "3",
-    type: "assignment",
-    title: "New Assignment Posted",
-    message: "Database Design Project Phase 2 assigned",
-    timestamp: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
-    courseId: "1",
-    isRead: true,
-  },
-  {
-    id: "4",
-    type: "announcement",
-    title: "Class Announcement",
-    message: "Office hours moved to Thursday 3-5 PM",
-    timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
-    courseId: "4",
-    isRead: true,
-  },
-  {
-    id: "5",
-    type: "grade",
-    title: "Grade Updated",
-    message: "Midterm Exam - 88/100",
-    timestamp: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
-    courseId: "3",
-    isRead: true,
-  },
-  {
-    id: "6",
-    type: "announcement",
-    title: "Important Announcement",
-    message: "Project presentations scheduled for next week",
-    timestamp: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000),
-    courseId: "2",
-    isRead: true,
-  },
-];
-
 export default function NotificationsScreen() {
   const { colors } = useTheme();
+  const { notifications, setNotifications } = useOutletContext();
   const [expandedId, setExpandedId] = useState(null);
   const [activeFilter, setActiveFilter] = useState("all");
-  const [notifications, setNotifications] = useState(initialNotifications);
   const [undoData, setUndoData] = useState(null);
   const undoTimeoutRef = useRef(null);
 
@@ -92,7 +36,8 @@ export default function NotificationsScreen() {
   };
 
   const formatNotificationTime = (date) => {
-    const diff = Date.now() - date.getTime();
+    const d = new Date(date);
+    const diff = Date.now() - d.getTime();
     const hours = Math.floor(diff / (1000 * 60 * 60));
     const days = Math.floor(diff / (1000 * 60 * 60 * 24));
 
@@ -106,28 +51,38 @@ export default function NotificationsScreen() {
     setExpandedId(expandedId === id ? null : id);
   };
 
-  const markAsRead = (id) => {
+  const toggleReadStatus = (id) => {
     const notification = notifications.find((n) => n.id === id);
-    if (notification && !notification.isRead) {
+    if (notification) {
+      const newReadStatus = !notification.isRead;
       setNotifications((prev) =>
-        prev.map((n) => (n.id === id ? { ...n, isRead: true } : n))
+        prev.map((n) => (n.id === id ? { ...n, isRead: newReadStatus } : n))
       );
-      
-      setUndoData({ id, wasRead: false });
-      
-      if (undoTimeoutRef.current) {
-        clearTimeout(undoTimeoutRef.current);
-      }
-      undoTimeoutRef.current = setTimeout(() => {
+
+      if (newReadStatus) {
+        setUndoData({ id, wasRead: false });
+
+        if (undoTimeoutRef.current) {
+          clearTimeout(undoTimeoutRef.current);
+        }
+        undoTimeoutRef.current = setTimeout(() => {
+          setUndoData(null);
+        }, 4000);
+      } else {
         setUndoData(null);
-      }, 4000);
+        if (undoTimeoutRef.current) {
+          clearTimeout(undoTimeoutRef.current);
+        }
+      }
     }
   };
 
   const undoMarkAsRead = () => {
     if (undoData) {
       setNotifications((prev) =>
-        prev.map((n) => (n.id === undoData.id ? { ...n, isRead: undoData.wasRead } : n))
+        prev.map((n) =>
+          n.id === undoData.id ? { ...n, isRead: undoData.wasRead } : n
+        )
       );
       if (undoTimeoutRef.current) {
         clearTimeout(undoTimeoutRef.current);
@@ -152,8 +107,21 @@ export default function NotificationsScreen() {
   const filteredNotifications = getFilteredNotifications();
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.backgroundSecondary }]}>
-      <View style={[styles.filterContainer, { backgroundColor: colors.background, borderBottomColor: colors.border }]}>
+    <View
+      style={[
+        styles.container,
+        { backgroundColor: colors.backgroundSecondary },
+      ]}
+    >
+      <View
+        style={[
+          styles.filterContainer,
+          {
+            backgroundColor: colors.background,
+            borderBottomColor: colors.border,
+          },
+        ]}
+      >
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -199,7 +167,7 @@ export default function NotificationsScreen() {
             notifInfo={getNotificationIcon(notification.type)}
             isExpanded={expandedId === notification.id}
             onToggleExpanded={() => toggleExpanded(notification.id)}
-            onMarkAsRead={() => markAsRead(notification.id)}
+            onToggleRead={() => toggleReadStatus(notification.id)}
             formatTime={formatNotificationTime}
             colors={colors}
           />
@@ -215,7 +183,9 @@ export default function NotificationsScreen() {
           </Text>
           <TouchableOpacity onPress={undoMarkAsRead} style={styles.undoButton}>
             <RotateCcw size={16} color={colors.primary} />
-            <Text style={[styles.undoText, { color: colors.primary }]}>Undo</Text>
+            <Text style={[styles.undoText, { color: colors.primary }]}>
+              Undo
+            </Text>
           </TouchableOpacity>
         </View>
       )}
@@ -229,7 +199,7 @@ const NotificationItem = ({
   notifInfo,
   isExpanded,
   onToggleExpanded,
-  onMarkAsRead,
+  onToggleRead,
   formatTime,
   colors,
 }) => {
@@ -264,7 +234,7 @@ const NotificationItem = ({
             duration: 300,
             useNativeDriver: true,
           }).start(() => {
-            onMarkAsRead();
+            onToggleRead();
             translateX.setValue(0);
           });
         } else {
@@ -346,32 +316,34 @@ const NotificationItem = ({
             </View>
           </View>
         </TouchableOpacity>
-
       </Animated.View>
     </View>
   );
 };
 
-const FilterButton = ({
-  label,
-  active,
-  onPress,
-  colors,
-}) => (
+const FilterButton = ({ label, active, onPress, colors }) => (
   <TouchableOpacity
     style={[
       styles.filterButton,
-      { backgroundColor: colors.backgroundSecondary, borderColor: colors.border },
-      active && { backgroundColor: colors.primary, borderColor: colors.primary },
+      {
+        backgroundColor: colors.backgroundSecondary,
+        borderColor: colors.border,
+      },
+      active && {
+        backgroundColor: colors.primary,
+        borderColor: colors.primary,
+      },
     ]}
     onPress={onPress}
     activeOpacity={0.7}
   >
-    <Text style={[
-      styles.filterButtonText,
-      { color: colors.text },
-      active && { color: "#FFFFFF" },
-    ]}>
+    <Text
+      style={[
+        styles.filterButtonText,
+        { color: colors.text },
+        active && { color: "#FFFFFF" },
+      ]}
+    >
       {label}
     </Text>
   </TouchableOpacity>

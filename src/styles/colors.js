@@ -19,15 +19,15 @@ const Colors = {
     error: "#EF4444",
   },
   dark: {
-    text: "#F9FAFB",
-    textSecondary: "#9CA3AF",
-    background: "#111827",
-    backgroundSecondary: "#1F2937",
+    text: "#F9FAFB", // Gray-50
+    textSecondary: "#9CA3AF", // Gray-400
+    background: "#111827", // Gray-900
+    backgroundSecondary: "#1F2937", // Gray-800
     tint: ritOrange,
-    tabIconDefault: "#6B7280",
+    tabIconDefault: "#6B7280", // Gray-500
     tabIconSelected: ritOrange,
-    border: "#374151",
-    card: "#1F2937",
+    border: "#374151", // Gray-700
+    card: "#1F2937", // Gray-800
     primary: ritOrange,
     secondary: ritBrown,
     success: "#10B981",

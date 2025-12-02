@@ -1,9 +1,16 @@
 /* eslint-disable react-refresh/only-export-components */
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { useColorScheme } from "react-native";
 
-import Colors from "./colors";
+import Colors from "@/styles/colors";
 
 const ThemeContext = createContext(null);
 
@@ -33,6 +40,17 @@ export function ThemeProvider({ children }) {
         : "light"
       : mode;
 
+  useEffect(() => {
+    const root = window.document.documentElement;
+    if (activeTheme === "light") {
+      root.classList.add("light");
+      root.classList.remove("dark");
+    } else {
+      root.classList.add("dark");
+      root.classList.remove("light");
+    }
+  }, [activeTheme]);
+
   const colors = Colors[activeTheme];
 
   const value = useMemo(
@@ -43,10 +61,12 @@ export function ThemeProvider({ children }) {
       setThemeMode,
       isLoaded,
     }),
-    [mode, activeTheme, colors, setThemeMode, isLoaded],
+    [mode, activeTheme, colors, setThemeMode, isLoaded]
   );
 
-  return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
+  return (
+    <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
+  );
 }
 
 export function useTheme() {

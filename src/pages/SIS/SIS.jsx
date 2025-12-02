@@ -28,10 +28,10 @@ import {
   CheckSquare,
   Square,
   Video,
-  MapPin
+  MapPin,
 } from "lucide-react-native";
 
-import { useTheme } from "@/constants/ThemeContext";
+import { useTheme } from "@/context/ThemeContext";
 import {
   advisors,
   cartCourses,
@@ -115,8 +115,9 @@ function TabButton({
   onPress,
   colors,
   badgeColor,
-  icon: Icon,
+  icon,
 }) {
+  const Icon = icon;
   return (
     <TouchableOpacity
       onPress={onPress}
@@ -127,10 +128,22 @@ function TabButton({
       activeOpacity={0.7}
     >
       <View style={styles.tabButtonContent}>
-        <Icon
-          size={20}
-          color={active ? colors.primary : colors.textSecondary}
-        />
+        <View>
+          <Icon
+            size={20}
+            color={active ? colors.primary : colors.textSecondary}
+          />
+          {badge !== undefined && badge > 0 && (
+            <View
+              style={[
+                styles.badge,
+                { backgroundColor: badgeColor || colors.primary },
+              ]}
+            >
+              <Text style={styles.badgeText}>{badge}</Text>
+            </View>
+          )}
+        </View>
         <Text
           style={[
             styles.tabLabel,
@@ -139,16 +152,6 @@ function TabButton({
         >
           {label}
         </Text>
-        {badge !== undefined && badge > 0 && (
-          <View
-            style={[
-              styles.badge,
-              { backgroundColor: badgeColor || colors.primary },
-            ]}
-          >
-            <Text style={styles.badgeText}>{badge}</Text>
-          </View>
-        )}
       </View>
     </TouchableOpacity>
   );
@@ -228,7 +231,12 @@ function AcademicRecords({ colors }) {
         </View>
       ))}
 
-      <View style={[styles.sectionHeader, { marginTop: 24, justifyContent: 'space-between' }]}>
+      <View
+        style={[
+          styles.sectionHeader,
+          { marginTop: 24, justifyContent: "space-between" },
+        ]}
+      >
         <View style={styles.headerTitleGroup}>
           <BookOpen size={20} color={colors.text} />
           <Text style={[styles.sectionTitle, { color: colors.text }]}>
@@ -247,7 +255,7 @@ function AcademicRecords({ colors }) {
         </View>
 
         {completed.length > 4 && (
-          <TouchableOpacity 
+          <TouchableOpacity
             onPress={() => setShowAll(!showAll)}
             style={styles.headerToggleButton}
             activeOpacity={0.7}
@@ -349,9 +357,10 @@ function ShoppingCartSection({ colors }) {
     // Logic to actually enroll
   };
 
-  const selectedCoursesText = selectedIndices.length > 0 
-    ? selectedIndices.map(i => cartCourses[i].courseCode).join(", ")
-    : "";
+  const selectedCoursesText =
+    selectedIndices.length > 0
+      ? selectedIndices.map((i) => cartCourses[i].courseCode).join(", ")
+      : "";
 
   return (
     <View>
@@ -373,17 +382,25 @@ function ShoppingCartSection({ colors }) {
             </Text>
           </View>
         </View>
-        <View style={[styles.cartSearchBar, { backgroundColor: colors.backgroundSecondary, borderColor: colors.border }]}>
-            <TextInput 
-              style={[styles.cartSearchInput, { color: colors.text }]}
-              placeholder="Search courses..."
-              placeholderTextColor={colors.textSecondary}
-              value={searchQuery}
-              onChangeText={setSearchQuery}
-            />
-            <TouchableOpacity style={styles.cartSearchButton}>
-               <Search size={20} color={colors.primary} />
-            </TouchableOpacity>
+        <View
+          style={[
+            styles.cartSearchBar,
+            {
+              backgroundColor: colors.backgroundSecondary,
+              borderColor: colors.border,
+            },
+          ]}
+        >
+          <TextInput
+            style={[styles.cartSearchInput, { color: colors.text }]}
+            placeholder="Search courses..."
+            placeholderTextColor={colors.textSecondary}
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+          />
+          <TouchableOpacity style={styles.cartSearchButton}>
+            <Search size={20} color={colors.primary} />
+          </TouchableOpacity>
         </View>
       </View>
 
@@ -416,7 +433,10 @@ function ShoppingCartSection({ colors }) {
                 <View style={styles.cartCourseInfo}>
                   <View style={styles.cartCourseHeader}>
                     <Text
-                      style={[styles.courseCode, { color: colors.textSecondary }]}
+                      style={[
+                        styles.courseCode,
+                        { color: colors.textSecondary },
+                      ]}
                     >
                       {course.courseCode}
                     </Text>
@@ -426,7 +446,9 @@ function ShoppingCartSection({ colors }) {
                         { backgroundColor: colors.backgroundSecondary },
                       ]}
                     >
-                      <Text style={[styles.creditsText, { color: colors.text }]}>
+                      <Text
+                        style={[styles.creditsText, { color: colors.text }]}
+                      >
                         {course.credits} cr
                       </Text>
                     </View>
@@ -478,7 +500,7 @@ function ShoppingCartSection({ colors }) {
                     </View>
                   </View>
                 </View>
-                
+
                 <View style={styles.cartActions}>
                   <TouchableOpacity
                     onPress={() => toggleSelection(index)}
@@ -492,7 +514,7 @@ function ShoppingCartSection({ colors }) {
                       <Square size={24} color={colors.textSecondary} />
                     )}
                   </TouchableOpacity>
-                  
+
                   <TouchableOpacity
                     onPress={() => handleRemove(course)}
                     style={styles.actionButton}
@@ -505,21 +527,35 @@ function ShoppingCartSection({ colors }) {
               </View>
             </View>
           ))}
-          
+
           <View style={styles.cartFooter}>
-             <TouchableOpacity 
-                style={[styles.footerButton, styles.verifyButton, { borderColor: colors.primary }]}
-                onPress={handleVerify}
-             >
-                <Text style={[styles.footerButtonText, { color: colors.primary }]}>Verify Courses</Text>
-             </TouchableOpacity>
-             
-             <TouchableOpacity 
-                style={[styles.footerButton, styles.enrollActionButton, { backgroundColor: colors.primary }]}
-                onPress={initiateEnroll}
-             >
-                <Text style={[styles.footerButtonText, { color: '#fff' }]}>Enroll</Text>
-             </TouchableOpacity>
+            <TouchableOpacity
+              style={[
+                styles.footerButton,
+                styles.verifyButton,
+                { borderColor: colors.primary },
+              ]}
+              onPress={handleVerify}
+            >
+              <Text
+                style={[styles.footerButtonText, { color: colors.primary }]}
+              >
+                Verify Courses
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[
+                styles.footerButton,
+                styles.enrollActionButton,
+                { backgroundColor: colors.primary },
+              ]}
+              onPress={initiateEnroll}
+            >
+              <Text style={[styles.footerButtonText, { color: "#fff" }]}>
+                Enroll
+              </Text>
+            </TouchableOpacity>
           </View>
 
           {/* Custom Confirmation Modal */}
@@ -530,10 +566,20 @@ function ShoppingCartSection({ colors }) {
             onRequestClose={() => setModalVisible(false)}
           >
             <View style={styles.modalOverlay}>
-              <View style={[styles.modalView, { backgroundColor: colors.card, borderColor: colors.border }]}>
-                <Text style={[styles.modalTitle, { color: colors.text }]}>Confirm Enrollment</Text>
-                <Text style={[styles.modalText, { color: colors.textSecondary }]}>
-                  Are you sure you want to enroll in the selected {selectedIndices.length > 1 ? "courses" : "course"}?
+              <View
+                style={[
+                  styles.modalView,
+                  { backgroundColor: colors.card, borderColor: colors.border },
+                ]}
+              >
+                <Text style={[styles.modalTitle, { color: colors.text }]}>
+                  Confirm Enrollment
+                </Text>
+                <Text
+                  style={[styles.modalText, { color: colors.textSecondary }]}
+                >
+                  Are you sure you want to enroll in the selected{" "}
+                  {selectedIndices.length > 1 ? "courses" : "course"}?
                   {"\n\n" + selectedCoursesText}
                 </Text>
                 <View style={styles.modalButtons}>
@@ -541,13 +587,22 @@ function ShoppingCartSection({ colors }) {
                     style={[styles.modalButton, styles.modalCancelButton]}
                     onPress={() => setModalVisible(false)}
                   >
-                    <Text style={[styles.modalButtonText, { color: colors.text }]}>Cancel</Text>
+                    <Text
+                      style={[styles.modalButtonText, { color: colors.text }]}
+                    >
+                      Cancel
+                    </Text>
                   </TouchableOpacity>
                   <TouchableOpacity
-                    style={[styles.modalButton, { backgroundColor: colors.primary }]}
+                    style={[
+                      styles.modalButton,
+                      { backgroundColor: colors.primary },
+                    ]}
                     onPress={confirmEnroll}
                   >
-                    <Text style={[styles.modalButtonText, { color: '#fff' }]}>Confirm</Text>
+                    <Text style={[styles.modalButtonText, { color: "#fff" }]}>
+                      Confirm
+                    </Text>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -569,8 +624,9 @@ function StarfishSection({ colors }) {
   };
 
   const confirmAppointment = (type) => {
-    // eslint-disable-next-line no-console
-    console.log(`Appointment booked: ${type} with ${selectedAppointment?.advisor.name} at ${selectedAppointment?.slot}`);
+    console.log(
+      `Appointment booked: ${type} with ${selectedAppointment?.advisor.name} at ${selectedAppointment?.slot}`
+    );
     setModalVisible(false);
     setSelectedAppointment(null);
   };
@@ -675,29 +731,47 @@ function StarfishSection({ colors }) {
         onRequestClose={() => setModalVisible(false)}
       >
         <View style={styles.modalOverlay}>
-          <View style={[styles.modalView, { backgroundColor: colors.card, borderColor: colors.border }]}>
-            <Text style={[styles.modalTitle, { color: colors.text }]}>Confirm Appointment</Text>
+          <View
+            style={[
+              styles.modalView,
+              { backgroundColor: colors.card, borderColor: colors.border },
+            ]}
+          >
+            <Text style={[styles.modalTitle, { color: colors.text }]}>
+              Confirm Appointment
+            </Text>
             {selectedAppointment && (
               <Text style={[styles.modalText, { color: colors.textSecondary }]}>
-                Schedule a meeting with {selectedAppointment.advisor.name} on {selectedAppointment.slot}?
+                Schedule a meeting with {selectedAppointment.advisor.name} on{" "}
+                {selectedAppointment.slot}?
               </Text>
             )}
-            
+
             <View style={styles.appointmentOptions}>
-              <TouchableOpacity 
-                style={[styles.optionButton, { borderColor: colors.primary, borderWidth: 1 }]}
-                onPress={() => confirmAppointment('Online')}
+              <TouchableOpacity
+                style={[
+                  styles.optionButton,
+                  { borderColor: colors.primary, borderWidth: 1 },
+                ]}
+                onPress={() => confirmAppointment("Online")}
               >
                 <Video size={24} color={colors.primary} />
-                <Text style={[styles.optionText, { color: colors.primary }]}>Online Meeting</Text>
+                <Text style={[styles.optionText, { color: colors.primary }]}>
+                  Online Meeting
+                </Text>
               </TouchableOpacity>
 
-              <TouchableOpacity 
-                style={[styles.optionButton, { borderColor: colors.primary, borderWidth: 1 }]}
-                onPress={() => confirmAppointment('In Person')}
+              <TouchableOpacity
+                style={[
+                  styles.optionButton,
+                  { borderColor: colors.primary, borderWidth: 1 },
+                ]}
+                onPress={() => confirmAppointment("In Person")}
               >
                 <MapPin size={24} color={colors.primary} />
-                <Text style={[styles.optionText, { color: colors.primary }]}>In Person</Text>
+                <Text style={[styles.optionText, { color: colors.primary }]}>
+                  In Person
+                </Text>
               </TouchableOpacity>
             </View>
 
@@ -705,7 +779,14 @@ function StarfishSection({ colors }) {
               style={styles.modalCancelLink}
               onPress={() => setModalVisible(false)}
             >
-              <Text style={[styles.modalCancelText, { color: colors.textSecondary }]}>Cancel</Text>
+              <Text
+                style={[
+                  styles.modalCancelText,
+                  { color: colors.textSecondary },
+                ]}
+              >
+                Cancel
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -928,26 +1009,31 @@ const styles = StyleSheet.create({
   },
   tabButton: {
     flex: 1,
-    paddingVertical: 14,
-    paddingHorizontal: 8,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 12,
     borderBottomWidth: 2,
   },
   tabButtonContent: {
-    flexDirection: "row",
     alignItems: "center",
-    gap: 6,
+    gap: 4,
   },
   tabLabel: {
     fontSize: 12,
     fontWeight: "600",
+    marginTop: 4,
   },
   badge: {
+    position: "absolute",
+    top: -8,
+    right: -10,
     minWidth: 18,
     height: 18,
     borderRadius: 9,
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: 5,
+    zIndex: 1,
   },
   badgeText: {
     color: "#FFFFFF",
@@ -1287,52 +1373,49 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "600",
   },
-  cartActions: {
-    alignItems: 'center',
-    justifyContent: 'flex-start',
-    gap: 60, // Increased gap from 24 to 32
-    paddingLeft: 4,
-  },
-  actionButton: {
-    padding: 4,
-  },
   cartFooter: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 12,
     marginTop: 12,
   },
   footerButton: {
     flex: 1,
     paddingVertical: 12,
-    borderRadius: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 1,
   },
   verifyButton: {
-    borderWidth: 1,
-    backgroundColor: 'transparent',
+    backgroundColor: "transparent",
   },
   enrollActionButton: {
+    borderWidth: 0,
+  },
+  cartActions: {
+    alignItems: "center",
+    justifyContent: "flex-start",
+    gap: 60, // Increased gap from 24 to 32
     // bg color set inline
   },
   footerButtonText: {
-    fontWeight: '700',
+    fontWeight: "700",
     fontSize: 15,
   },
   // Modal Styles
   modalOverlay: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   modalView: {
-    width: '350px',
+    width: "350px",
     borderRadius: 16,
     padding: 24,
     borderWidth: 1,
-    alignItems: 'center',
-    shadowColor: '#000',
+    alignItems: "center",
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 4,
@@ -1340,52 +1423,52 @@ const styles = StyleSheet.create({
   },
   modalTitle: {
     fontSize: 18,
-    fontWeight: '700',
+    fontWeight: "700",
     marginBottom: 12,
   },
   modalText: {
     fontSize: 15,
-    textAlign: 'center',
+    textAlign: "center",
     marginBottom: 24,
   },
   modalButtons: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 12,
-    width: '300px',
+    width: "300px",
   },
   modalButton: {
     flex: 1,
     paddingVertical: 12,
     borderRadius: 8,
-    alignItems: 'center',
+    alignItems: "center",
   },
   modalCancelButton: {
-    backgroundColor: 'transparent',
+    backgroundColor: "transparent",
     borderWidth: 1,
-    borderColor: '#ccc',
+    borderColor: "#ccc",
   },
   modalButtonText: {
-    fontWeight: '600',
+    fontWeight: "600",
     fontSize: 15,
   },
   appointmentOptions: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 16,
     marginBottom: 24,
-    width: '100%',
+    width: "100%",
   },
   optionButton: {
     flex: 1,
     padding: 16,
     borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     gap: 8,
   },
   optionText: {
-    fontWeight: '600',
+    fontWeight: "600",
     fontSize: 14,
-    textAlign: 'center',
+    textAlign: "center",
   },
   modalCancelLink: {
     marginTop: 8,
@@ -1393,6 +1476,6 @@ const styles = StyleSheet.create({
   },
   modalCancelText: {
     fontSize: 15,
-    fontWeight: '500',
+    fontWeight: "500",
   },
 });

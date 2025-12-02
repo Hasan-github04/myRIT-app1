@@ -11,23 +11,57 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  /* Default Dark Theme Variables */
+  --bg-primary: #111827;
+  --bg-secondary: #1F2937;
+  --text-primary: #F9FAFB;
+  --text-secondary: #9CA3AF;
+  --border-color: #374151;
+  --primary-color: #F76902;
+  --card-bg: #1F2937;
+  --input-bg: #374151;
+}
+
+/* Light Theme Overrides */
+:root.light {
+  --bg-primary: #FFFFFF;
+  --bg-secondary: #F9FAFB;
+  --text-primary: #111827;
+  --text-secondary: #6B7280;
+  --border-color: #E5E7EB;
+  --card-bg: #FFFFFF;
+  --input-bg: #F3F4F6;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
 }
 
 body {
-  margin-left: 750px;
+  margin: 0;
   padding: 0;
-  width: 500px;
+  width: 100%;
   height: 100vh;
-  overflow: hidden;
-  align-items: center;
+  display: flex;
   justify-content: center;
+  align-items: center;
+  background-color: #000000; /* Keep desktop frame black */
+  overflow: hidden; /* Prevent body scroll */
+  color: var(--text-primary);
 }
 
 #root {
   display: flex;
   flex-direction: column;
   width: 100%;
-  height: 100%;
+  max-width: 480px; /* Mobile size constraint */
+  height: 100%; /* Fill the fixed body height */
+  max-height: 100vh;
+  background-color: var(--bg-primary); /* App background */
+  overflow: hidden; /* Prevent root scroll, children must scroll */
+  position: relative;
+  box-shadow: 0 0 20px rgba(0,0,0,0.5); /* Shadow for desktop view */
 }
 
 @media (prefers-color-scheme: light) {

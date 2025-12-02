@@ -238,7 +238,7 @@ export const cartCourses = [
     seats: 8,
     maxSeats: 30,
   },
-  
+
 ];
 
 export const advisors = [
@@ -318,3 +318,20 @@ export const studentHolds = [
     resolved: false,
   },
 ];
+
+export const extendedStudentInfo = {
+  ...studentInfo,
+  ritId: "770009926",
+  dob: "July 30, 2004",
+  phone: "+971 50-715-1802",
+  campusAddress:
+    "RIT Dubai New Campus Opposite to DSO Warehouses - Dubai Silicon Oasis - Dubai",
+  homeAddress: "SS lootah 3, Al Nahda\nDubai, UAE",
+  emergencyContact: {
+    name: "Arshad Alam",
+    relation: "Parent",
+    phone: "+971 50-332-9827",
+  },
+  status: "Full-time Active",
+  college: "Golisano College of Computing and Information Sciences",
+};

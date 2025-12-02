@@ -9,7 +9,7 @@ import {
 import { ChevronDown, ChevronUp } from "lucide-react-native";
 import { useNavigate } from "react-router-dom";
 
-import { useTheme } from "@/constants/ThemeContext";
+import { useTheme } from "@/context/ThemeContext";
 import { assignments, courses } from "@/mocks/courses";
 
 export default function MyCoursesScreen() {

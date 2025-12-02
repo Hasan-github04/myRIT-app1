@@ -1,22 +1,22 @@
 export const events = [
   {
     id: "1",
-    title: "Career Fair 2025",
+    title: "Career Fair Spring 2025",
     type: "event",
     date: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
-    location: "Gordon Field House",
+    location: "RIT Innovation Center",
     description:
-      "Meet with top tech companies including Google, Microsoft, Amazon, and more. Bring your resume and dress professionally!",
+      "Meet with top tech companies including PWS, Petrofac, and more. Bring your resume and dress professionally!",
     organizer: "Career Services",
     attendees: 234,
   },
   {
     id: "2",
-    title: "Spring Break Schedule Changes",
+    title: "Fall Break Schedule Announcement",
     type: "announcement",
     date: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000),
     description:
-      "Reminder: Classes will not meet during spring break week (March 3-7). All assignments due during this week have been moved to March 10.",
+      "Reminder: Classes will not meet during Fall break week (Dec 17 - Jan 12).",
     organizer: "Registrar's Office",
   },
   {

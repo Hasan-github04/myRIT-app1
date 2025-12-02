@@ -14,11 +14,13 @@
 }
 
 body {
-  margin: 0;
+  margin-left: 800px;
   padding: 0;
-  width: 100vw;
+  width: 500px;
   height: 100vh;
   overflow: hidden;
+  align-items: center;
+  justify-content: center;
 }
 
 #root {
